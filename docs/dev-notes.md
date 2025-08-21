@@ -1,0 +1,1 @@
+- 2025-08-22 smoke OK: CRUD end-to-end passed
