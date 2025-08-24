@@ -410,5 +410,71 @@ gh repo create todo-api --public --source=. --remote=origin --push
 
 ---
 
-> これで、**README を含む初期プロジェクトの作成〜動作確認〜GitHub 公開**までを通せます。必要なら上記のコードをベースに、認証やカレンダー連携の設計も追記します。
+これで、README を含む初期プロジェクトの作成〜動作確認〜GitHub 公開までを通せます。  
+必要なら上記のコードをベースに、認証やカレンダー連携の設計も追記します。
+
+---
+
+---
+
+## API Quick Reference / 使い方
+
+### Health Check
+```bash
+curl http://localhost:3000/
+# => {"ok":true,"message":"Server is running 🚀"}
+
+### Create ToDo
+
+```bash
+curl -X POST http://localhost:3000/todos \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Write README","status":"in-progress"}'
+
+### List ToDos
+
+```bash
+curl http://localhost:3000/todos
+
+### Update ToDo
+
+```bash
+curl -X PUT http://localhost:3000/todos/<_id> \
+  -H "Content-Type: application/json" \
+  -d '{"status":"completed"}'
+
+### Delete ToDo
+
+```bash
+curl -i -X DELETE http://localhost:3000/todos/<_id>
+
+### Validation Example
+
+title が無い場合はエラーを返します。
+
+```bash
+curl -X POST http://localhost:3000/todos \
+  -H "Content-Type: application/json" \
+  -d '{"status":"pending"}'
+
+結果:
+
+```bash
+{"error":"Validation error","details":[...]}
+
+### Setup / 開発手順
+
+```bash
+# 1) clone
+git clone <your-repo-url>
+cd todo-api
+
+# 2) 環境変数を準備
+cp server/.env.example server/.env
+
+# 3) サーバー起動
+cd server
+npm install
+npm run dev
+
 
