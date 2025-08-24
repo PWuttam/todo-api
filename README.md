@@ -423,6 +423,7 @@ gh repo create todo-api --public --source=. --remote=origin --push
 ```bash
 curl http://localhost:3000/
 # => {"ok":true,"message":"Server is running 🚀"}
+```
 
 ### Create ToDo
 
@@ -430,11 +431,13 @@ curl http://localhost:3000/
 curl -X POST http://localhost:3000/todos \
   -H "Content-Type: application/json" \
   -d '{"title":"Write README","status":"in-progress"}'
+```
 
 ### List ToDos
 
 ```bash
 curl http://localhost:3000/todos
+```
 
 ### Update ToDo
 
@@ -442,11 +445,13 @@ curl http://localhost:3000/todos
 curl -X PUT http://localhost:3000/todos/<_id> \
   -H "Content-Type: application/json" \
   -d '{"status":"completed"}'
+```
 
 ### Delete ToDo
 
 ```bash
 curl -i -X DELETE http://localhost:3000/todos/<_id>
+```
 
 ### Validation Example
 
@@ -456,11 +461,13 @@ title が無い場合はエラーを返します。
 curl -X POST http://localhost:3000/todos \
   -H "Content-Type: application/json" \
   -d '{"status":"pending"}'
+```
 
 結果:
 
 ```bash
 {"error":"Validation error","details":[...]}
+```
 
 ### Setup / 開発手順
 
@@ -476,5 +483,5 @@ cp server/.env.example server/.env
 cd server
 npm install
 npm run dev
-
+```
 
