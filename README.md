@@ -64,14 +64,15 @@ NODE_ENV=development
 ### Todos
 
 | Method | Path         | Description       | Body (JSON)                                                                 |
-| -----: | ------------ | ----------------- | --------------------------------------------------------------------------- | ----- | ----------------------- |
-|    GET | `/todos`     | List todos        | —                                                                           |
-|   POST | `/todos`     | Create a todo     | `{ "title": "string", "description": "?", "dueDate": "ISO", "status": "todo | doing | done", "tags": ["?"] }` |
-|    GET | `/todos/:id` | Get by id         | —                                                                           |
-|    PUT | `/todos/:id` | Update all fields | same as POST                                                                |
+|--------|--------------|-------------------|-----------------------------------------------------------------------------|
+| GET    | `/todos`     | List todos        | —                                                                           |
+| POST   | `/todos`     | Create a todo     | `{ "title": "string", "description": "?", "dueDate": "ISO", "status": "todo \| doing \| done", "tags": ["?"] }` |
+| GET    | `/todos/:id` | Get by id         | —                                                                           |
+| PUT    | `/todos/:id` | Update all fields | same as POST                                                                |
 | DELETE | `/todos/:id` | Delete by id      | —                                                                           |
 
-Validation is handled by express-validator in routes.
+> Validation is handled by **express-validator** in routes.
+
 
 ### Example
 
@@ -85,7 +86,7 @@ curl -X POST http://localhost:3000/todos \
 
 ## Project Structure
 
-```bash
+```text
 server/
 ├─ server.js               # App entry
 ├─ config/
