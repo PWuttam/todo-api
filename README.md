@@ -23,25 +23,54 @@ This README focuses on **quick setup**, **clear API usage**, and **next steps fo
 
 ## Quick Start
 
-```bash
 # 1) Install deps
+
 cd server
 npm install
 
 # 2) set env (see .env.example)
+
 cp .env.example .env
 
 # 3) run dev server (nodemon)
+
 npm run dev
 
 # default: http://localhost:3000
-```
 
-### Health check:
+## Health check:
 
-```bash
 curl -s http://localhost:3000/todos | jq .
-```
+
+## Quick Reference
+
+# Create
+
+curl -X POST http://localhost:3000/todos \
+ -H "Content-Type: application/json" \
+ -d '{"title":"テストタスク","status":"pending"}'
+
+# List
+
+curl http://localhost:3000/todos
+
+# List with filters (optional)
+
+curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
+
+# Get by ID
+
+curl http://localhost:3000/todos/<id>
+
+# Update
+
+curl -X PUT http://localhost:3000/todos/<id> \
+ -H "Content-Type: application/json" \
+ -d '{"status":"completed"}'
+
+# Delete
+
+curl -X DELETE http://localhost:3000/todos/<id>
 
 ---
 
@@ -63,16 +92,15 @@ NODE_ENV=development
 
 ### Todos
 
-| Method | Path         | Description       | Body (JSON)                                                                 |
-|--------|--------------|-------------------|-----------------------------------------------------------------------------|
-| GET    | `/todos`     | List todos        | —                                                                           |
+| Method | Path         | Description       | Body (JSON)                                                                                                     |
+| ------ | ------------ | ----------------- | --------------------------------------------------------------------------------------------------------------- |
+| GET    | `/todos`     | List todos        | —                                                                                                               |
 | POST   | `/todos`     | Create a todo     | `{ "title": "string", "description": "?", "dueDate": "ISO", "status": "todo \| doing \| done", "tags": ["?"] }` |
-| GET    | `/todos/:id` | Get by id         | —                                                                           |
-| PUT    | `/todos/:id` | Update all fields | same as POST                                                                |
-| DELETE | `/todos/:id` | Delete by id      | —                                                                           |
+| GET    | `/todos/:id` | Get by id         | —                                                                                                               |
+| PUT    | `/todos/:id` | Update all fields | same as POST                                                                                                    |
+| DELETE | `/todos/:id` | Delete by id      | —                                                                                                               |
 
 > Validation is handled by **express-validator** in routes.
-
 
 ### Example
 
