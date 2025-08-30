@@ -23,20 +23,20 @@ This README focuses on **quick setup**, **clear API usage**, and **next steps fo
 
 ## Quick Start
 
-# 1) Install deps
+### 1) Install deps
 
 cd server
 npm install
 
-# 2) set env (see .env.example)
+### 2) set env (see .env.example)
 
 cp .env.example .env
 
-# 3) run dev server (nodemon)
+### 3) run dev server (nodemon)
 
 npm run dev
 
-# default: http://localhost:3000
+### default: http://localhost:3000
 
 ## Health check:
 
@@ -44,31 +44,31 @@ curl -s http://localhost:3000/todos | jq .
 
 ## Quick Reference
 
-# Create
+### Create
 
 curl -X POST http://localhost:3000/todos \
  -H "Content-Type: application/json" \
  -d '{"title":"テストタスク","status":"pending"}'
 
-# List
+### List
 
 curl http://localhost:3000/todos
 
-# List with filters (optional)
+### List with filters (optional)
 
 curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
 
-# Get by ID
+### Get by ID
 
 curl http://localhost:3000/todos/<id>
 
-# Update
+### Update
 
 curl -X PUT http://localhost:3000/todos/<id> \
  -H "Content-Type: application/json" \
  -d '{"status":"completed"}'
 
-# Delete
+### Delete
 
 curl -X DELETE http://localhost:3000/todos/<id>
 
