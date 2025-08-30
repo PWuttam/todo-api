@@ -16,4 +16,8 @@ const todoSchema = new Schema(
   { timestamps: true }
 );
 
+// 検索・並び替えのパフォーマンス向上
+todoSchema.index({ status: 1, dueDate: 1, createdAt: -1 });
+todoSchema.index({ title: 'text' }); // タイトル検索（text検索を使う場合）
+
 module.exports = model('Todo', todoSchema);
