@@ -154,6 +154,22 @@ bash ../scripts/smoke.sh
 
 ---
 
+### Development Scripts
+
+- `npm run dev` – start server with nodemon
+- `npm start` – start server normally
+
+### Seed sample data
+
+開発中はサンプルデータを投入して動作確認できます。
+
+`````bash
+cd server
+npm run seed:reset                 # 固定10件に初期化
+npm run seed:gen -- --count 40     # （任意）合計40件までランダム補充
+
+---
+
 ## Error Handling
 
 All errors are normalized by middlewares/error.js.
@@ -210,7 +226,7 @@ git commit -m "docs: refresh README (clear quickstart, API table, diagram)"
 git push origin docs/refresh-readme
 # （GitHubでPRを作ってMerge）
 
-````
+`````
 
 すぐ main に入れたい場合はブランチなしで
 git add README.md && git commit -m "docs: refresh README" && git push origin main
