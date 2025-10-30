@@ -1,10 +1,15 @@
 // server/server.js
 require('dotenv').config();
+console.log('🌱 NODE_ENV:', process.env.NODE_ENV);
+
 const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./config/db');
 const todosRouter = require('./routes/todos');
 const errorHandler = require('./middlewares/error');
+
+// ルートの読み込み
+const userRoutes = require('../routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +25,9 @@ app.use(express.json());
 
 // ルート
 app.use('/todos', todosRouter);
+
+// userRoutes を登録
+app.use('/users', userRoutes);
 
 // 共通エラーハンドラ（最後）
 app.use(errorHandler);
