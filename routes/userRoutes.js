@@ -1,7 +1,8 @@
 // routes/userRoutes.js
-const express = require('express');
+import express from "express";
+import asyncHandler from "../utils/asyncHandler.js";
+
 const router = express.Router();
-const asyncHandler = require('../utils/asyncHandler');
 
 // 確認用：通常ルート
 router.get('/', asyncHandler(async (req, res) => {
@@ -17,4 +18,4 @@ router.get('/error-test', asyncHandler(async (req, res) => {
   throw new Error('テストエラー発生！');
 }));
 
-module.exports = router;
+export default router;

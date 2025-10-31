@@ -1,11 +1,9 @@
 // server/config/db.js
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-async function connectDB() {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/todo_api';
-  mongoose.set('strictQuery', true);
+export async function connectDB(mongoUri) {
+  const uri = mongoUri || "mongodb://127.0.0.1:27017/todo_api";
+  mongoose.set("strictQuery", true);
   await mongoose.connect(uri);
-  console.log('MongoDB connected');
+  console.log("MongoDB connected");
 }
-
-module.exports = { connectDB };

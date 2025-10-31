@@ -1,12 +1,17 @@
 {
+  "name": "todo-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "joi": "^18.0.1"
+  },
   "devDependencies": {
     "@types/node": "^24.8.1",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "express": "^5.1.0"
-  },
-  "scripts": {
-  "start": "node server/server.js"
   }
 }

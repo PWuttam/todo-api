@@ -1,11 +1,17 @@
 // server/services/todos.service.js
-const Todo = require('../models/todo');
+// ============================================
+// 🔹 役割：Todoデータの実際の操作（DB処理）を行う
+// ============================================
 
-exports.createTodo = async (data) => {
+import Todo from "../models/todo.js"; // ✅ require → import に変更
+
+// CREATE（Todo新規作成）
+export async function createTodo(data) {
   return await Todo.create(data);
-};
+}
 
-exports.getTodos = async (query, options) => {
+// READ（Todo一覧取得）
+export async function getTodos(query, options) {
   const { sortObj, pageNum, limitNum } = options;
   const [items, total] = await Promise.all([
     Todo.find(query)
@@ -15,15 +21,17 @@ exports.getTodos = async (query, options) => {
     Todo.countDocuments(query),
   ]);
   return { items, total };
-};
+}
 
-exports.updateTodo = async (id, data) => {
+// UPDATE（Todo更新）
+export async function updateTodo(id, data) {
   return await Todo.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true,
   });
-};
+}
 
-exports.deleteTodo = async (id) => {
+// DELETE（Todo削除）
+export async function deleteTodo(id) {
   return await Todo.findByIdAndDelete(id);
-};
+}
