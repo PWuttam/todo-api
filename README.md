@@ -1,233 +1,235 @@
-✅ Paste-ready README (English)
+# 🗂️ Todo API (Node.js + Express + MongoDB)
 
-# Todo API (Node.js + Express + MongoDB)
+A **minimal, production-ready REST API** for managing todo items — built with **Express** and **Mongoose**, following clean and extensible architecture principles.
 
-A minimal, well-structured REST API for todo items. Built with **Express** and **Mongoose**, with room to grow (tests, CI, docs).  
-This README focuses on **quick setup**, **clear API usage**, and **next steps for production**.
-
----
-
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [Environment Variables](#environment-variables)
-- [API Reference](#api-reference)
-- [Project Structure](#project-structure)
-- [Development Scripts](#development-scripts)
-- [Error Handling](#error-handling)
-- [Roadmap / Improvements](#roadmap--improvements)
-- [Docs](#docs)
-- [License](#license)
+This project serves as a foundation for building robust backend APIs with a clear structure, validation, and roadmap toward production quality.
 
 ---
 
-## Quick Start
+## 📋 Table of Contents
 
-### 1) Install deps
+- [Quick Start](#-quick-start)
+- [Tech Stack](#-tech-stack)
+- [Environment Variables](#-environment-variables)
+- [API Reference](#-api-reference)
+- [Project Structure](#-project-structure)
+- [Development Scripts](#-development-scripts)
+- [Error Handling](#-error-handling)
+- [Roadmap / Improvements](#-roadmap--improvements)
+- [Docs](#-docs)
+- [License](#-license)
+- [Contributing](#-contributing)
 
+---
+
+## 🚀 Quick Start
+
+### 1️⃣ Install dependencies
+
+```bash
 cd server
 npm install
+```
 
-### 2) set env (see .env.example)
+### 2️⃣ Configure environment variables
 
+```bash
 cp .env.example .env
+```
 
-### 3) run dev server (nodemon)
+✅ .env.example reflects the latest required variables.
 
+### 3️⃣ Start development server
+
+```bash
 npm run dev
+```
 
-### default: http://localhost:3000
+Default URL:
+➡️ http://localhost:3000
 
-## Health check:
+Health check：
 
+```bash
 curl -s http://localhost:3000/todos | jq .
+```
 
-## Quick Reference
+## 🧰 Tech Stack
 
-### Create
+| Layer          | Technology                |
+| -------------- | ------------------------- |
+| Runtime        | Node.js (18+)             |
+| Framework      | Express                   |
+| Database       | MongoDB + Mongoose        |
+| Validation     | express-validator         |
+| Config         | dotenv                    |
+| Error Handling | Custom middleware         |
+| Dev Tools      | Nodemon, ESLint, Prettier |
+| Testing        | Jest (planned)            |
 
-curl -X POST http://localhost:3000/todos \
- -H "Content-Type: application/json" \
- -d '{"title":"テストタスク","status":"pending"}'
+ℹ️ Continuous Integration (CI) via GitHub Actions is not yet configured.
+It will be added as part of roadmap milestone “v0.3 – CI & Testing”.
 
-### List
+## 🔑 Environment Variables
 
-curl http://localhost:3000/todos
+Create a .env file based on .env.example:
 
-### List with filters (optional)
-
-curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
-
-### Get by ID
-
-curl http://localhost:3000/todos/<id>
-
-### Update
-
-curl -X PUT http://localhost:3000/todos/<id> \
- -H "Content-Type: application/json" \
- -d '{"status":"completed"}'
-
-### Delete
-
-curl -X DELETE http://localhost:3000/todos/<id>
-
----
-
-## Environment Variables
-
-### Create a .env file based on .env.example:
-
-```ini
+```bash
 MONGODB_URI=mongodb://localhost:27017/todo-api
 PORT=3000
 NODE_ENV=development
 ```
 
----
+## 📡 API Reference
 
-## API Reference
+Base URL: http://localhost:3000
 
-### Base URL: http://localhost:3000
+| Method | Path         | Description      | Body (JSON)                                               |       |                         |
+| :----- | :----------- | :--------------- | :-------------------------------------------------------- | ----- | ----------------------- |
+| GET    | `/todos`     | List all todos   | —                                                         |       |                         |
+| POST   | `/todos`     | Create a todo    | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
+| GET    | `/todos/:id` | Get a todo by ID | —                                                         |       |                         |
+| PUT    | `/todos/:id` | Update a todo    | same as POST                                              |       |                         |
+| DELETE | `/todos/:id` | Delete a todo    | —                                                         |       |                         |
 
-### Todos
-
-| Method | Path         | Description       | Body (JSON)                                                                                                     |
-| ------ | ------------ | ----------------- | --------------------------------------------------------------------------------------------------------------- |
-| GET    | `/todos`     | List todos        | —                                                                                                               |
-| POST   | `/todos`     | Create a todo     | `{ "title": "string", "description": "?", "dueDate": "ISO", "status": "todo \| doing \| done", "tags": ["?"] }` |
-| GET    | `/todos/:id` | Get by id         | —                                                                                                               |
-| PUT    | `/todos/:id` | Update all fields | same as POST                                                                                                    |
-| DELETE | `/todos/:id` | Delete by id      | —                                                                                                               |
-
-> Validation is handled by **express-validator** in routes.
+✅ Validation handled via express-validator in route definitions.
 
 ### Example
 
 ```bash
 curl -X POST http://localhost:3000/todos \
   -H "Content-Type: application/json" \
-  -d '{ "title":"Write README", "status":"todo" }'
+  -d '{ "title": "Write README", "status": "todo" }'
 ```
 
----
+### Optional query filters
 
-## Project Structure
+```bash
+curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
+```
 
-```text
+## 🗂️ Project Structure
+
+```bash
 server/
 ├─ server.js               # App entry
 ├─ config/
 │  └─ db.js                # Mongoose connection
 ├─ routes/
 │  └─ todos.js             # /todos CRUD + validation
+├─ controllers/
+│  └─ todos.controller.js  # Controller layer
+├─ services/
+│  └─ todos.service.js     # Business logic layer
 ├─ models/
 │  └─ todo.js              # Mongoose schema
 ├─ middlewares/
 │  └─ error.js             # Global error handler
 └─ package.json
+
 scripts/
-└─ smoke.sh                # quick end-to-end smoke test
+└─ smoke.sh                # Quick end-to-end test
+
 docs/
 ├─ dev-notes.md
 ├─ pm-brief.md
-└─ todo-api-flow-with-improvements.png   # architecture diagram
+└─ todo-api-flow-with-improvements.png   # Architecture diagram
 ```
 
----
+## 🧪 Development Scripts
 
-## Development Scripts
-
-### From server/:
+From the server/ directory:
 
 ```bash
-npm run dev        # start with nodemon
-npm start          # start (production-like)
-npm test           # (placeholder)
+npm run dev     # start server with nodemon
+npm start       # start normally (production-like)
+npm test        # placeholder — testing framework (Jest) not yet implemented
 ```
-
-### Smoke test
-
-```bash
-bash ../scripts/smoke.sh
-```
-
----
-
-### Development Scripts
-
-- `npm run dev` – start server with nodemon
-- `npm start` – start server normally
 
 ### Seed sample data
 
-開発中はサンプルデータを投入して動作確認できます。
-
-`````bash
-cd server
-npm run seed:reset                 # 固定10件に初期化
-npm run seed:gen -- --count 40     # （任意）合計40件までランダム補充
-
----
-
-## Error Handling
-
-All errors are normalized by middlewares/error.js.
-
-- Non-production shows stack traces for easier debugging.
-
-- Consider adding an async wrapper to unify async/await error flows.
-
----
-
-## Roadmap / Improvements
-
-- 🧪 Automated tests: Jest + Supertest for CRUD and regressions
-- 📝 Linting/Formatting: ESLint + Prettier (CI enforced)
-- ⚠️ Error wrapper for async routes
-- 📘 API Docs: Swagger/OpenAPI (serve at /docs)
-- 🔍 Logging: morgan (HTTP) + winston (app)
-- 🛡 Security: helmet, rate limits, CORS policy
-- ⚙️ Config: environment-based configuration loader
-- CI: run tests + scripts/smoke.sh on PR via GitHub Actions
-
----
-
-## Docs
-
-- Developer Notes — [docs/dev-notes.md](docs/dev-notes.md)
-- PM Brief — [docs/pm-brief.md](docs/pm-brief.md)
-- Architecture Diagram — [docs/todo-api-flow-with-improvements.png](docs/todo-api-flow-with-improvements.png)
-
----
-
-## License
-
-### MIT
-
-````yaml
-
-### ターミナルで置き換える手順
+For testing with mock data:
 
 ```bash
-# 1) ブランチを切る（推奨）
+cd server
+npm run seed:reset                 # reset to fixed 10 records
+npm run seed:gen -- --count 40     # generate up to 40 random records
+```
+
+## ⚠️ Error Handling
+
+All errors are normalized through middlewares/error.js.
+- Stack traces visible only in non-production mode.
+- Future improvement: unify async route handling with a global wrapper.
+- 400/404/500 responses are structured for frontend consumption.
+
+## 🧭 Roadmap / Improvements
+
+- 🧪 Add automated tests (Jest + Supertest)
+- 🧹 Enforce ESLint + Prettier in CI
+- ⚙️ Add async route wrapper for clean error flow
+- 📘 Integrate Swagger/OpenAPI at /docs
+- 🔍 Add morgan (HTTP logs) + winston (app logs)
+- 🛡 Add helmet, CORS rules, rate limiting
+- 🔧 Introduce config loader by environment
+- 🚀 CI/CD: run smoke + test via GitHub Actions
+
+## 📘 Docs
+
+- 🧑‍💻 Developer Notes
+- 🗂 PM Brief
+- 🧩 Architecture Diagram
+- 🤝 Contributing
+
+Pull requests are welcome!
+If you’d like to suggest improvements or report issues, please open an issue or a pull request.
+
+## 📄 License
+
+Released under the MIT License.
+See LICENSE for details.
+
+## 📘 Resources
+
+- 🇯🇵 Japanese README
+- Developer Notes
+- PM Brief
+- Architecture Diagram
+
+## 🪄 Quick Commit Workflow
+
+```bash
+# Create a new branch
 git checkout -b docs/refresh-readme
 
-# 2) READMEを開く（nano 例）
+# Edit and save
 nano README.md
-# → 既存内容を全選択で消して、上のMarkdownをペースト
-# 保存: Ctrl+O, Enter / 終了: Ctrl+X
 
-# 3) 変更を確認してコミット
+# Commit and push
 git add README.md
-git commit -m "docs: refresh README (clear quickstart, API table, diagram)"
-
-# 4) プッシュ＆PR
+git commit -m "docs: refresh README (add clarity and transparency notes)"
 git push origin docs/refresh-readme
-# （GitHubでPRを作ってMerge）
+```
 
-`````
+## ✅ Notes
 
-すぐ main に入れたい場合はブランチなしで
-git add README.md && git commit -m "docs: refresh README" && git push origin main
-でも OK。
+- CI not yet configured — transparency added
+- npm test clearly marked as placeholder
+- .env.example alignment verified
+- Topics: consider adding
+- nodejs, express, mongodb, mongoose, rest-api, backend, portfolio, javascript
+- under repository About → Edit Topics
+- Footer cleaned up for better readability
+
+
+
+
+
+
+
+
+
+
+
+
+
