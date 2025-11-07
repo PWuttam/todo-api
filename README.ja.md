@@ -1,0 +1,229 @@
+# 🗂️ Todo API（Node.js + Express + MongoDB）
+
+**Express** と **Mongoose** を使用して構築された、シンプルかつ拡張性のある **ToDo管理用REST API** です。  
+明確なアーキテクチャ、バリデーション、エラーハンドリングを備え、  
+本番運用を見据えた堅牢なバックエンドAPI構築のベースとして設計されています。
+
+---
+
+## 📋 目次
+
+- [クイックスタート](#-クイックスタート)
+- [使用技術（Tech Stack）](#-使用技術tech-stack)
+- [環境変数](#-環境変数)
+- [APIリファレンス](#-apiリファレンス)
+- [プロジェクト構成](#-プロジェクト構成)
+- [開発用スクリプト](#-開発用スクリプト)
+- [エラーハンドリング](#-エラーハンドリング)
+- [ロードマップ / 改善予定](#-ロードマップ--改善予定)
+- [ドキュメント](#-ドキュメント)
+- [ライセンス](#-ライセンス)
+- [コントリビューション（貢献）](#-コントリビューション貢献)
+
+---
+
+## 🚀 クイックスタート
+
+### 1️⃣ 依存パッケージをインストール
+
+```bash
+cd server
+npm install
+```
+
+## 2️⃣ 環境変数ファイルを設定
+
+```bash
+cp .env.example .env
+```
+
+✅ .env.example は最新の環境変数構成を反映済みです。
+
+## 3️⃣ 開発サーバーを起動
+
+```bash
+npm run dev
+```
+
+デフォルトURL：
+➡️ http://localhost:3000
+
+### 動作確認（ヘルスチェック）：
+
+```bash
+curl -s http://localhost:3000/todos | jq .
+```
+
+##  🧰 使用技術（Tech Stack）
+
+| レイヤー      | 使用技術                      |
+| :-------- | :------------------------ |
+| 実行環境      | Node.js (18+)             |
+| フレームワーク   | Express                   |
+| データベース    | MongoDB + Mongoose        |
+| バリデーション   | express-validator         |
+| 設定管理      | dotenv                    |
+| エラーハンドリング | カスタムミドルウェア                |
+| 開発支援      | Nodemon, ESLint, Prettier |
+| テスト       | Jest（予定）                  |
+
+ℹ️ GitHub Actions を用いた継続的インテグレーション（CI）は まだ設定されていません。
+今後のマイルストーン「v0.3 – CI & Testing」で導入予定です。
+
+## 🔑 環境変数
+
+.env.example を参考に .env ファイルを作成します：
+
+```bash
+MONGODB_URI=mongodb://localhost:27017/todo-api
+PORT=3000
+NODE_ENV=development
+```
+
+## 📡 APIリファレンス
+
+Base URL: http://localhost:3000
+
+| メソッド   | パス           | 説明        | Body（JSON）                                                |       |                         |
+| :----- | :----------- | :-------- | :-------------------------------------------------------- | ----- | ----------------------- |
+| GET    | `/todos`     | ToDo一覧を取得 | —                                                         |       |                         |
+| POST   | `/todos`     | ToDoを作成   | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
+| GET    | `/todos/:id` | ID指定で取得   | —                                                         |       |                         |
+| PUT    | `/todos/:id` | ToDoを更新   | POSTと同様                                                   |       |                         |
+| DELETE | `/todos/:id` | ToDoを削除   | —                                                         |       |                         |
+
+✅ バリデーションは express-validator によりルート定義時に実行されます。
+
+### 作成例
+
+```bash
+curl -X POST http://localhost:3000/todos \
+  -H "Content-Type: application/json" \
+  -d '{ "title": "READMEを書く", "status": "todo" }'
+```
+
+### フィルター付き取得例
+
+```bash
+curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
+```
+
+## 🗂️ プロジェクト構成
+
+```bash
+todo-api/
+├── README.md                  # 英語版README
+├── README.ja.md               # 日本語版README（このファイル）
+│
+├── data/
+│   └── seed.todos.json        # サンプルToDoデータ
+│
+├── docs/
+│   ├── dev-notes.md           # 開発メモ
+│   ├── pm-brief.md            # PM向け概要資料
+│   ├── learning/              # 学習関連ドキュメント置き場
+│   └── todo-api-flow-with-improvements.png   # アーキテクチャ図
+│
+├── middlewares/
+│   └── error.js               # グローバルエラーハンドラ
+│
+├── routes/
+│   └── userRoutes.js          # /users系ルート
+│
+├── scripts/
+│   ├── seed.js                # データベース初期化スクリプト
+│   └── smoke.sh               # 簡易E2Eスモークテスト
+│
+├── server/
+│   ├── config/                # DB設定
+│   ├── controllers/           # コントローラ層
+│   ├── middlewares/           # API専用ミドルウェア
+│   ├── models/                # Mongooseモデル
+│   ├── routes/                # /todos ルート
+│   ├── services/              # ビジネスロジック層
+│   ├── server.js              # APIエントリーポイント
+│   ├── package.json
+│   └── package-lock.json
+│
+├── src/
+│   ├── arrays.ts
+│   ├── objects.ts
+│   ├── variables.ts
+│   ├── hello.ts
+│   ├── functions/             # TypeScript練習用コード
+│   └── classes/
+│
+├── utils/
+│   └── asyncHandler.js        # 非同期処理ラッパー
+│
+├── eslint.config.js           # ESLint設定
+├── tsconfig.json              # TypeScript設定
+├── setup-labels.sh            # GitHubラベル設定スクリプト
+├── package.json
+├── package-lock.json
+└── node_modules/
+```
+
+## 🧪 開発用スクリプト
+
+server/ ディレクトリで実行します：
+
+```bash
+npm run dev     # nodemonで開発モード起動
+npm start       # 通常起動（本番想定）
+npm test        # placeholder — Jestテストは未実装です
+```
+
+### サンプルデータ生成
+
+開発中にダミーデータを投入するには：
+
+```bash
+cd server
+npm run seed:reset                 # 固定10件にリセット
+npm run seed:gen -- --count 40     # ランダムデータを最大40件まで追加
+```
+
+## ⚠️ エラーハンドリング
+
+すべてのエラーは middlewares/error.js で一元管理されます。
+
+- 本番環境以外ではスタックトレースを出力
+- 非同期ルートの統一的エラーハンドリングは今後追加予定
+- 400 / 404 / 500 応答は整形済みで、フロント側で扱いやすい形式
+
+## 🧭 ロードマップ / 改善予定
+
+- 🧪 Jest + Supertest による自動テスト追加
+- 🧹 ESLint + Prettier のCI自動チェック
+- ⚙️ 非同期ルート用エラーハンドラ追加
+- 📘 Swagger / OpenAPI ドキュメントを /docs で提供
+- 🔍 morgan（HTTPログ）+ winston（アプリログ）導入
+- 🛡 helmet / CORS / Rate Limit によるセキュリティ強化
+- 🔧 環境別設定ローダーの導入
+- 🚀 GitHub Actions による自動テスト・スモークテスト実行
+
+## 📘 ドキュメント
+
+- 🧑‍💻 [開発者ノート](./docs/dev-notes.md)
+- 🗂 [PM向け概要資料](./docs/pm-brief.md)
+- 🧩 [アーキテクチャ図](./docs/todo-api-flow-with-improvements.png)
+
+## 🤝 コントリビューション（貢献）
+
+Pull Request は歓迎です！
+改善提案・バグ報告は Issuesページ からどうぞ。
+
+## 📄 ライセンス
+
+本プロジェクトは MITライセンス で公開されています。
+詳細は LICENSE をご覧ください。
+
+## 📘 関連リソース
+
+- [🇬🇧 English README](./README.md)
+- [開発者ノート](./docs/dev-notes.md)
+- [PM向け概要資料](./docs/pm-brief.md)
+- [アーキテクチャ図](./docs/todo-api-flow-with-improvements.png)
+
+
