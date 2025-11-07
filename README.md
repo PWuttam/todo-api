@@ -111,30 +111,60 @@ curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=d
 ## 🗂️ Project Structure
 
 ```bash
-server/
-├─ server.js               # App entry
-├─ config/
-│  └─ db.js                # Mongoose connection
-├─ routes/
-│  └─ todos.js             # /todos CRUD + validation
-├─ controllers/
-│  └─ todos.controller.js  # Controller layer
-├─ services/
-│  └─ todos.service.js     # Business logic layer
-├─ models/
-│  └─ todo.js              # Mongoose schema
-├─ middlewares/
-│  └─ error.js             # Global error handler
-└─ package.json
-
-scripts/
-└─ smoke.sh                # Quick end-to-end test
-
-docs/
-├─ dev-notes.md
-├─ pm-brief.md
-└─ todo-api-flow-with-improvements.png   # Architecture diagram
+todo-api/
+├── README.md                  # Main English README
+├── README.ja.md               # Japanese translation (localized)
+│
+├── data/
+│   └── seed.todos.json        # Sample todo dataset for seeding
+│
+├── docs/
+│   ├── dev-notes.md           # Developer notes
+│   ├── pm-brief.md            # PM summary (project overview)
+│   ├── learning/              # Space for study-related materials
+│   └── todo-api-flow-with-improvements.png   # Architecture diagram
+│
+├── middlewares/
+│   └── error.js               # Global error handler (outside server/)
+│
+├── routes/
+│   └── userRoutes.js          # Example route (non-todo endpoints)
+│
+├── scripts/
+│   ├── seed.js                # Initialize database with seed data
+│   └── smoke.sh               # Quick end-to-end smoke test
+│
+├── server/
+│   ├── config/                # MongoDB & environment config
+│   ├── controllers/           # Controller layer
+│   ├── middlewares/           # Express middlewares (API-specific)
+│   ├── models/                # Mongoose models
+│   ├── routes/                # /todos CRUD routes
+│   ├── services/              # Business logic layer
+│   ├── server.js              # API entry point
+│   ├── package.json
+│   └── package-lock.json
+│
+├── src/
+│   ├── arrays.ts
+│   ├── objects.ts
+│   ├── variables.ts
+│   ├── hello.ts
+│   ├── functions/             # TypeScript practice files
+│   └── classes/
+│
+├── utils/
+│   └── asyncHandler.js        # Async/await wrapper for routes
+│
+├── eslint.config.js           # ESLint Flat Config
+├── tsconfig.json              # TypeScript compiler settings
+├── setup-labels.sh            # GitHub Issues label setup script
+├── package.json               # Root package config
+├── package-lock.json
+└── node_modules/              # Installed dependencies
 ```
+
+
 
 ## 🧪 Development Scripts
 
@@ -191,10 +221,10 @@ See LICENSE for details.
 
 ## 📘 Resources
 
-- 🇯🇵 Japanese README
-- Developer Notes
-- PM Brief
-- Architecture Diagram
+- [🇯🇵 Japanese README](./README.ja.md)
+- [Developer Notes](./docs/dev-notes.md)
+- [PM Brief](./docs/pm-brief.md)
+- [Architecture Diagram](./docs/todo-api-flow-with-improvements.png)
 
 ## 🪄 Quick Commit Workflow
 
