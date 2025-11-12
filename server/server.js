@@ -1,6 +1,9 @@
 // server/server.js
 import express from "express";
 import cors from "cors";
+import morgan from "morgan";
+import helmet from "helmet"; 
+import rateLimit from "express-rate-limit";
 import { connectDB } from "./config/db.js";
 import todosRouter from "./routes/todos.js";
 import errorHandler from "./middlewares/error.js";
@@ -12,13 +15,23 @@ console.log("🌱 NODE_ENV:", config.nodeEnv);
 const app = express();
 const PORT = config.port;
 // まずは IPv4 に固定（確実に curl できる）。必要なら '0.0.0.0' や '::1' に変更
-const HOST = "127.0.0.1";
+const HOST = "0.0.0.0";
 
-// --- 最初に必ず見えるログ＆最低限の疎通用ヘルスチェック ---
-app.use((req, _res, next) => {
-  console.log(req.method, req.url);
-  next();
+// --- 一番最初に morgan を登録（アクセスログ用） ---
+app.use(morgan("combined")); 
+// 例: ::1 - GET /users 200 15 - 2.345 ms
+
+// セキュリティヘッダーを有効化
+app.use(helmet());
+
+// 🚫 アクセス制限（DoS対策）
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15分
+  max: 100, // 各IPごとに最大100リクエスト
+  message: "Too many requests, please try again later.",
 });
+app.use(limiter);
+
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use(cors());
@@ -39,7 +52,7 @@ process.on("unhandledRejection", (r) => {
 });
 process.on("uncaughtException", (e) => {
   console.error("UNCAUGHT EXCEPTION:", e);
-  process.exit(1);
+  // process.exit(1); //
 });
 
 async function start() {
