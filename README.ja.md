@@ -54,6 +54,83 @@ npm run dev
 curl -s http://localhost:3000/todos | jq .
 ```
 
+## 🐳 Docker を使った起動方法（API + MongoDB）
+
+Node.js API と MongoDB を Docker 上でまとめて動かせます。  
+ローカルに MongoDB をインストールする必要がなく、**最も簡単で安定した開発環境**です。
+
+---
+
+### 1️⃣ コンテナを起動する
+
+```bash
+docker compose up -d
+```
+
+起動するサービス：
+	•	api（Node.js / Express）
+	•	mongo（MongoDB）
+
+### 2️⃣ API が正常に動作しているか確認
+
+```bash
+curl http://localhost:3000/health
+```
+
+期待されるレスポンス：
+
+```bash
+{ "ok": true }
+```
+
+### 3️⃣ curl を使って ToDo API を操作する
+
+📝 ToDo を作成
+
+```bash
+curl -X POST http://localhost:3000/todos \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Docker todo","completed":false}'
+```
+
+📄 ToDo 一覧を取得
+
+```bash
+curl http://localhost:3000/todos
+```
+
+✏️ ToDo を更新
+
+```bash
+curl -X PUT http://localhost:3000/todos/<id> \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated","status":"completed"}'
+```
+
+🗑️ ToDo を削除
+
+```bash
+curl -X DELETE http://localhost:3000/todos/<id>
+```
+
+### 4️⃣ コンテナを停止する
+
+```bash
+docker compose down
+```
+
+5️⃣ Docker 用の環境変数ファイル
+
+Docker 開発用には .env.docker を使用します。
+
+カスタマイズしたい場合：
+
+```bash
+cp .env.docker .env
+```
+
+---
+
 ##  🧰 使用技術（Tech Stack）
 
 | レイヤー      | 使用技術                      |

@@ -1,0 +1,36 @@
+{
+  "name": "todo-api dev container",
+
+  // ★ compose を使う場合、image は書かない！
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+
+  // 起動するサービス名（compose の `api:` と一致させること）
+  "service": "api",
+
+  // VS Code がコンテナ内で開くディレクトリ
+  "workspaceFolder": "/app",
+
+  // コンテナ起動後に実行されるコマンド
+  "postCreateCommand": "npm install",
+
+  // VS Code の拡張を自動インストール
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+
+  // 公開するポート
+  "forwardPorts": [3000],
+
+  // ホストの env をコンテナへ渡す（必要なら追加）
+  "remoteEnv": {
+    "NODE_ENV": "development"
+  }
+}

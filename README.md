@@ -54,6 +54,79 @@ Health check：
 curl -s http://localhost:3000/todos | jq .
 ```
 
+## 🐳 Run with Docker (API + MongoDB)
+
+You can run the entire backend stack (Node.js API + MongoDB) using Docker.
+
+This is the recommended setup for local development because it isolates the environment and requires no local MongoDB installation.
+
+### 1️⃣ Start services
+
+```bash
+docker compose up -d
+```
+
+This will launch:
+	•	api (Node.js Express server)
+	•	mongo (MongoDB database)
+
+### 2️⃣ Check if the API is running
+
+```bash
+curl http://localhost:3000/health
+```
+
+Expected response:
+
+```bash
+{ "ok": true }
+```
+
+### 3️⃣ Try the API using curl
+
+Create a todo
+
+```bash
+curl -X POST http://localhost:3000/todos \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Docker todo","completed":false}'
+```
+
+Get all todos
+
+```bash
+curl http://localhost:3000/todos
+```
+
+Update a todo
+
+```bash
+curl -X PUT http://localhost:3000/todos/<id> \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated","status":"completed"}'
+```
+
+Delete a todo
+
+```bash
+curl -X DELETE http://localhost:3000/todos/<id>
+```
+
+### 4️⃣ Stop containers
+
+```bash
+docker compose down
+```
+
+### 5️⃣ Environment variables
+
+Docker development uses .env.docker.
+To customize:
+
+```bash
+cp .env.docker .env
+```
+
 ## 🧰 Tech Stack
 
 | Layer          | Technology                |

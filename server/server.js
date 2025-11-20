@@ -57,20 +57,31 @@ process.on("uncaughtException", (e) => {
 
 async function start() {
   try {
-    // ✅ DB成功後にだけ listen する
-    await connectDB(); // connectにオプションがあるならここで指定
+    // 1. まず DB に接続
+    await connectDB();
+
+    // 2. DB がつながったらサーバーを起動
     const server = app.listen(PORT, HOST, () => {
       const addr = server.address();
-      console.log(
-        `Listening on ${addr.address}:${addr.port} (${addr.family})`
-      );
+
+      // 3. addr が null の場合は安全に処理
+      if (!addr) {
+        console.log("Server started, but address() returned null");
+        return;
+      }
+
+      // 4. 正常なら住所（HOSTとPORT）を表示
+      console.log(`Listening on ${addr.address}:${addr.port} (${addr.family})`);
     });
+
+    // 5. サーバー起動時のエラーをキャッチ
     server.on("error", (err) => {
       console.error("Server listen error:", err);
     });
+
   } catch (err) {
+    // 6. DB接続に失敗したらエラーメッセージを出して終了
     console.error("Startup error (DB connection failed):", err);
-    // 必要ならここで fallback して DBなしでも listen する処理に切り替え可
     process.exit(1);
   }
 }
