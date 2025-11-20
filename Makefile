@@ -1,20 +1,36 @@
-.PHONY: up down build logs restart mongo-shell
+# ==========================
+# Makefile for todo-api
+# ==========================
 
+# Shortcut to start containers
 up:
-	docker compose up --build
+	docker compose up -d
 
+# Start with build (for first time)
+build:
+	docker compose up --build -d
+
+# Stop containers
 down:
 	docker compose down
 
-build:
-	docker compose build --no-cache
-
-logs:
-	docker compose logs -f
-
+# Restart containers
 restart:
 	docker compose down
-	docker compose up --build
+	docker compose up -d
 
-mongo-shell:
+# Show logs (API)
+logs:
+	docker logs -f todo-api
+
+# Show logs (Mongo)
+mongo-logs:
+	docker logs -f todo-mongo
+
+# Open Mongo shell
+mongo:
 	docker exec -it todo-mongo mongosh
+
+# Remove all containers + volumes (dangerous)
+clean:
+	docker compose down --volumes --remove-orphans
