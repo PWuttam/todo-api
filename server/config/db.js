@@ -1,8 +1,6 @@
 // server/config/db.js
 import mongoose from 'mongoose';
-
-export async function connectDB() {
-  const uri = process.env.MONGO_URI;
+import config from './index.js';
 
 export async function connectDB(uri = config.mongoUri) {
   if (!uri) {
