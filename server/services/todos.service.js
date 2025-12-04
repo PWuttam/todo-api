@@ -3,7 +3,7 @@
 // 🔹 役割：Todoデータの実際の操作（DB処理）を行う
 // ============================================
 
-import Todo from "../models/todo.js"; // ✅ require → import に変更
+import Todo from '../models/todo.js'; // ✅ require → import に変更
 
 // CREATE（Todo新規作成）
 export async function createTodo(data) {

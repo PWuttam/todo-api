@@ -1,4 +1,4 @@
-# 🗂️ Todo API（Node.js + Express + MongoDB）
+# 🗂️ Todo API（Node.js + Express + MongoDB） ![CI](https://github.com/PWuttam/todo-api/actions/workflows/ci.yml/badge.svg)
 
 **Express** と **Mongoose** を使用して構築された、シンプルかつ拡張性のある **ToDo管理用REST API** です。  
 明確なアーキテクチャ、バリデーション、エラーハンドリングを備え、  
@@ -68,8 +68,8 @@ docker compose up -d
 ```
 
 起動するサービス：
-	•	api（Node.js / Express）
-	•	mongo（MongoDB）
+• api（Node.js / Express）
+• mongo（MongoDB）
 
 ### 2️⃣ API が正常に動作しているか確認
 
@@ -131,18 +131,18 @@ cp .env.docker .env
 
 ---
 
-##  🧰 使用技術（Tech Stack）
+## 🧰 使用技術（Tech Stack）
 
-| レイヤー      | 使用技術                      |
-| :-------- | :------------------------ |
-| 実行環境      | Node.js (18+)             |
-| フレームワーク   | Express                   |
-| データベース    | MongoDB + Mongoose        |
-| バリデーション   | express-validator         |
-| 設定管理      | dotenv                    |
-| エラーハンドリング | カスタムミドルウェア                |
-| 開発支援      | Nodemon, ESLint, Prettier |
-| テスト       | Jest（予定）                  |
+| レイヤー           | 使用技術                  |
+| :----------------- | :------------------------ |
+| 実行環境           | Node.js (18+)             |
+| フレームワーク     | Express                   |
+| データベース       | MongoDB + Mongoose        |
+| バリデーション     | express-validator         |
+| 設定管理           | dotenv                    |
+| エラーハンドリング | カスタムミドルウェア      |
+| 開発支援           | Nodemon, ESLint, Prettier |
+| テスト             | Jest（予定）              |
 
 ℹ️ GitHub Actions を用いた継続的インテグレーション（CI）は まだ設定されていません。
 今後のマイルストーン「v0.3 – CI & Testing」で導入予定です。
@@ -161,13 +161,13 @@ NODE_ENV=development
 
 Base URL: http://localhost:3000
 
-| メソッド   | パス           | 説明        | Body（JSON）                                                |       |                         |
-| :----- | :----------- | :-------- | :-------------------------------------------------------- | ----- | ----------------------- |
-| GET    | `/todos`     | ToDo一覧を取得 | —                                                         |       |                         |
-| POST   | `/todos`     | ToDoを作成   | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
-| GET    | `/todos/:id` | ID指定で取得   | —                                                         |       |                         |
-| PUT    | `/todos/:id` | ToDoを更新   | POSTと同様                                                   |       |                         |
-| DELETE | `/todos/:id` | ToDoを削除   | —                                                         |       |                         |
+| メソッド | パス         | 説明           | Body（JSON）                                              |       |                         |
+| :------- | :----------- | :------------- | :-------------------------------------------------------- | ----- | ----------------------- |
+| GET      | `/todos`     | ToDo一覧を取得 | —                                                         |       |                         |
+| POST     | `/todos`     | ToDoを作成     | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
+| GET      | `/todos/:id` | ID指定で取得   | —                                                         |       |                         |
+| PUT      | `/todos/:id` | ToDoを更新     | POSTと同様                                                |       |                         |
+| DELETE   | `/todos/:id` | ToDoを削除     | —                                                         |       |                         |
 
 ✅ バリデーションは express-validator によりルート定義時に実行されます。
 
@@ -302,5 +302,3 @@ Pull Request は歓迎です！
 - [開発者ノート](./docs/dev-notes.md)
 - [PM向け概要資料](./docs/pm-brief.md)
 - [アーキテクチャ図](./docs/todo-api-flow-with-improvements.png)
-
-
