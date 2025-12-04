@@ -1,4 +1,4 @@
-# 🗂️ Todo API（Node.js + Express + MongoDB）
+# 🗂️ Todo API（Node.js + Express + MongoDB） ![CI](https://github.com/PWuttam/todo-api/actions/workflows/ci.yml/badge.svg)
 
 **Express** と **Mongoose** を使用して構築された、シンプルかつ拡張性のある **ToDo管理用REST API** です。  
 明確なアーキテクチャ、バリデーション、エラーハンドリングを備え、  

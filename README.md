@@ -1,4 +1,4 @@
-# 🗂️ Todo API (Node.js + Express + MongoDB)
+# 🗂️ Todo API (Node.js + Express + MongoDB) ![CI](https://github.com/PWuttam/todo-api/actions/workflows/ci.yml/badge.svg)
 
 A **minimal, production-ready REST API** for managing todo items — built with **Express** and **Mongoose**, following clean and extensible architecture principles.
 
