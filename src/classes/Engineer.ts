@@ -1,7 +1,10 @@
 // src/classes/Engineer.ts
 
 class User {
-  constructor(public name: string, protected age: number) {}
+  constructor(
+    public name: string,
+    protected age: number
+  ) {}
 
   introduce(): void {
     console.log(`👋 Hi, I'm ${this.name}. I'm ${this.age} years old.`);
@@ -20,7 +23,7 @@ class Engineer extends User {
   }
 
   code(): void {
-    const langs = this.languages.join(", ");
+    const langs = this.languages.join(', ');
     console.log(`💻 ${this.name} is coding in ${langs}.`);
   }
 
@@ -35,14 +38,14 @@ class Engineer extends User {
 
 // 実行例
 const engineer = new Engineer(
-  "Takuya",
+  'Takuya',
   40,
-  ["TypeScript", "Go"],
-  "Backend Engineer",
-  "AI-powered workflow optimizer"
+  ['TypeScript', 'Go'],
+  'Backend Engineer',
+  'AI-powered workflow optimizer'
 );
 
-engineer.introduce();     // 👋 Hi, I'm Takuya. I'm 40 years old.
-engineer.code();          // 💻 Takuya is coding in TypeScript, Go.
-engineer.describeWork();  // 🛠 Takuya is a Backend Engineer working on AI-powered workflow optimizer.
-engineer.birthday();      // 🎂 Takuya will turn 41 next year.
+engineer.introduce(); // 👋 Hi, I'm Takuya. I'm 40 years old.
+engineer.code(); // 💻 Takuya is coding in TypeScript, Go.
+engineer.describeWork(); // 🛠 Takuya is a Backend Engineer working on AI-powered workflow optimizer.
+engineer.birthday(); // 🎂 Takuya will turn 41 next year.

@@ -47,7 +47,7 @@ function parseArgs() {
     file: getVal('--file'),
     random: args.includes('--random'),
     count: parseInt(getVal('--count', '0'), 10) || 0,
-    seed: getVal('--seed')
+    seed: getVal('--seed'),
   };
 }
 
@@ -58,19 +58,31 @@ function makeRng(seedStr) {
   for (let i = 0; i < s.length; i++) x ^= s.charCodeAt(i) << (i % 24);
   if (x === 0) x = 0x9e3779b9;
   return () => {
-    x ^= x << 13; x ^= x >>> 17; x ^= x << 5;
-    return ((x >>> 0) / 0xFFFFFFFF);
+    x ^= x << 13;
+    x ^= x >>> 17;
+    x ^= x << 5;
+    return (x >>> 0) / 0xffffffff;
   };
 }
-function pick(arr, rnd) { return arr[Math.floor(rnd() * arr.length)]; }
-function randint(min, max, rnd) { return Math.floor(rnd() * (max - min + 1)) + min; }
+function pick(arr, rnd) {
+  return arr[Math.floor(rnd() * arr.length)];
+}
+function randint(min, max, rnd) {
+  return Math.floor(rnd() * (max - min + 1)) + min;
+}
 
 function randomTitle(rnd) {
   const bases = [
-    'Polish README', 'Investigate API bug', 'Refactor routes',
-    'Add tests', 'Update docs', 'Review env config',
-    'Add request logging', 'Unify error handling',
-    'Create seed data', 'Setup CI'
+    'Polish README',
+    'Investigate API bug',
+    'Refactor routes',
+    'Add tests',
+    'Update docs',
+    'Review env config',
+    'Add request logging',
+    'Unify error handling',
+    'Create seed data',
+    'Setup CI',
   ];
   const suffix = ['v0.1', 'quick', 'minor', 'follow-up', 'review', 'draft'];
   return `${pick(bases, rnd)} ${pick(suffix, rnd)}`;
@@ -78,8 +90,12 @@ function randomTitle(rnd) {
 
 function randomDescription(rnd) {
   const parts = [
-    'Small improvement.', 'Needs review.', 'Follow acceptance criteria.',
-    'Low priority.', 'High priority task.', 'Add tests if possible.'
+    'Small improvement.',
+    'Needs review.',
+    'Follow acceptance criteria.',
+    'Low priority.',
+    'High priority task.',
+    'Add tests if possible.',
   ];
   return pick(parts, rnd);
 }
@@ -96,12 +112,12 @@ async function insertFixedFromFile(filePath) {
   const text = fs.readFileSync(full, 'utf-8');
   const items = JSON.parse(text);
   if (!Array.isArray(items)) throw new Error('seed file must be an array');
-  const docs = items.map(it => ({
+  const docs = items.map((it) => ({
     title: it.title,
     description: it.description || '',
     status: STATUSES.includes(it.status) ? it.status : 'pending',
     tags: Array.isArray(it.tags) ? it.tags : [],
-    dueDate: it.dueDate ? new Date(it.dueDate) : undefined
+    dueDate: it.dueDate ? new Date(it.dueDate) : undefined,
   }));
   const res = await Todo.insertMany(docs);
   return res.length;
@@ -119,7 +135,7 @@ async function insertRandom(n, seedStr) {
       description: randomDescription(rnd),
       status,
       tags,
-      dueDate: randomDueDate(rnd)
+      dueDate: randomDueDate(rnd),
     };
   });
   const res = await Todo.insertMany(docs);
@@ -152,7 +168,9 @@ async function main() {
     if (toAdd > 0) {
       const n = await insertRandom(toAdd, opt.seed);
       inserted += n;
-      console.log(`[seed] Random filled: ${n} (target=${opt.count}, after=${await Todo.countDocuments()})`);
+      console.log(
+        `[seed] Random filled: ${n} (target=${opt.count}, after=${await Todo.countDocuments()})`
+      );
     } else {
       console.log('[seed] No random fill needed (already at or above target).');
     }
@@ -169,6 +187,8 @@ async function main() {
 
 main().catch(async (err) => {
   console.error('[seed] Error:', err);
-  try { await mongoose.disconnect(); } catch (_) {}
+  try {
+    await mongoose.disconnect();
+  } catch (_) {}
   process.exit(1);
 });

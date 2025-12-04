@@ -1,12 +1,72 @@
 [
-  { "title": "Write README outline", "description": "Top-level sections", "status": "pending", "tags": ["docs"], "dueDate": null },
-  { "title": "Implement GET /todos", "description": "Filters: status, tag, q", "status": "in-progress", "tags": ["backend","api"], "dueDate": null },
-  { "title": "Add request logging", "description": "morgan or pino", "status": "pending", "tags": ["ops"], "dueDate": null },
-  { "title": "Set up .env example", "description": "MONGODB_URI", "status": "completed", "tags": ["setup"], "dueDate": null },
-  { "title": "Create seed script", "description": "fixed & random modes", "status": "in-progress", "tags": ["devex"], "dueDate": null },
-  { "title": "Add index on title", "description": "text index if needed", "status": "pending", "tags": ["db"], "dueDate": null },
-  { "title": "Write API examples", "description": "curl & Postman", "status": "pending", "tags": ["docs","api"], "dueDate": null },
-  { "title": "Implement POST /todos", "description": "validation", "status": "pending", "tags": ["backend"], "dueDate": null },
-  { "title": "Refactor router", "description": "split by resource", "status": "pending", "tags": ["backend","cleanup"], "dueDate": null },
-  { "title": "Add CI workflow", "description": "lint & test", "status": "pending", "tags": ["ci"], "dueDate": null }
+  {
+    "title": "Write README outline",
+    "description": "Top-level sections",
+    "status": "pending",
+    "tags": ["docs"],
+    "dueDate": null
+  },
+  {
+    "title": "Implement GET /todos",
+    "description": "Filters: status, tag, q",
+    "status": "in-progress",
+    "tags": ["backend", "api"],
+    "dueDate": null
+  },
+  {
+    "title": "Add request logging",
+    "description": "morgan or pino",
+    "status": "pending",
+    "tags": ["ops"],
+    "dueDate": null
+  },
+  {
+    "title": "Set up .env example",
+    "description": "MONGODB_URI",
+    "status": "completed",
+    "tags": ["setup"],
+    "dueDate": null
+  },
+  {
+    "title": "Create seed script",
+    "description": "fixed & random modes",
+    "status": "in-progress",
+    "tags": ["devex"],
+    "dueDate": null
+  },
+  {
+    "title": "Add index on title",
+    "description": "text index if needed",
+    "status": "pending",
+    "tags": ["db"],
+    "dueDate": null
+  },
+  {
+    "title": "Write API examples",
+    "description": "curl & Postman",
+    "status": "pending",
+    "tags": ["docs", "api"],
+    "dueDate": null
+  },
+  {
+    "title": "Implement POST /todos",
+    "description": "validation",
+    "status": "pending",
+    "tags": ["backend"],
+    "dueDate": null
+  },
+  {
+    "title": "Refactor router",
+    "description": "split by resource",
+    "status": "pending",
+    "tags": ["backend", "cleanup"],
+    "dueDate": null
+  },
+  {
+    "title": "Add CI workflow",
+    "description": "lint & test",
+    "status": "pending",
+    "tags": ["ci"],
+    "dueDate": null
+  }
 ]

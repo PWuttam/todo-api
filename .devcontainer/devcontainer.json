@@ -2,9 +2,7 @@
   "name": "todo-api dev container",
 
   // ★ compose を使う場合、image は書かない！
-  "dockerComposeFile": [
-    "../docker-compose.yml"
-  ],
+  "dockerComposeFile": ["../docker-compose.yml"],
 
   // 起動するサービス名（compose の `api:` と一致させること）
   "service": "api",
