@@ -67,8 +67,8 @@ docker compose up -d
 ```
 
 This will launch:
-	•	api (Node.js Express server)
-	•	mongo (MongoDB database)
+• api (Node.js Express server)
+• mongo (MongoDB database)
 
 ### 2️⃣ Check if the API is running
 
@@ -237,8 +237,6 @@ todo-api/
 └── node_modules/              # Installed dependencies
 ```
 
-
-
 ## 🧪 Development Scripts
 
 From the server/ directory:
@@ -262,6 +260,7 @@ npm run seed:gen -- --count 40     # generate up to 40 random records
 ## ⚠️ Error Handling
 
 All errors are normalized through middlewares/error.js.
+
 - Stack traces visible only in non-production mode.
 - Future improvement: unify async route handling with a global wrapper.
 - 400/404/500 responses are structured for frontend consumption.
@@ -323,15 +322,3 @@ git push origin docs/refresh-readme
 - nodejs, express, mongodb, mongoose, rest-api, backend, portfolio, javascript
 - under repository About → Edit Topics
 - Footer cleaned up for better readability
-
-
-
-
-
-
-
-
-
-
-
-
