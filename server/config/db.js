@@ -1,9 +1,8 @@
 // server/config/db.js
 import mongoose from 'mongoose';
+import config from './index.js';
 
-export async function connectDB() {
-  const uri = process.env.MONGO_URI;
-
+export async function connectDB(uri = config.mongoUri) {
   if (!uri) {
     console.error('❌ MONGO_URI が設定されていません (.env / .env.docker を確認)');
     process.exit(1);

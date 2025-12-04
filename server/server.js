@@ -57,10 +57,8 @@ process.on('uncaughtException', (e) => {
 
 async function start() {
   try {
-    // 1. まず DB に接続
     await connectDB();
 
-    // 2. DB がつながったらサーバーを起動
     const server = app.listen(PORT, HOST, () => {
       const addr = server.address();
 
