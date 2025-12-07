@@ -29,6 +29,9 @@ export function createApp() {
   });
   app.use(limiter);
 
+  // ルート（トップページ）
+  app.get('/', (_req, res) => res.json({ ok: true }));
+
   // --- ヘルスチェック ---
   app.get('/health', (_req, res) => res.json({ ok: true }));
 

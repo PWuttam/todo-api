@@ -32,6 +32,9 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// ルート（トップページ）
+app.get('/', (_req, res) => res.json({ ok: true }));
+
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.use(cors());

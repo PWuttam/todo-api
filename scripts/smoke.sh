@@ -15,7 +15,7 @@ echo "$CREATE" | jq .
 ID=$(echo "$CREATE" | jq -r '._id')
 
 echo "== List =="
-curl -s ${BASE_URL}/todos | jq 'length, .[0]'
+curl -s ${BASE_URL}/todos | jq .
 
 echo "== Update =="
 curl -s -X PUT ${BASE_URL}/todos/${ID} \
