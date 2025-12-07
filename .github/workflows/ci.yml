@@ -21,7 +21,7 @@ jobs:
       - name: Prepare env for Docker Compose
         run: |
           cat <<'EOF' > .env.docker
-          MONGODB_URI=mongodb://mongo:27017/todo_api
+          MONGODB_URI=mongodb://root:example@mongo:27017/todo_api?authSource=admin
           PORT=3000
           NODE_ENV=development
           EOF
