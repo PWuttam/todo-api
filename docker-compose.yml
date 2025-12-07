@@ -10,7 +10,7 @@ services:
       - .env.docker
     depends_on:
       - mongo
-    command: npm run dev
+    command: node server/server.js
 
   mongo:
     image: mongo:7
