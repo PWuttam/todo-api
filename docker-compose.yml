@@ -4,13 +4,11 @@ services:
     container_name: todo-api
     ports:
       - '3000:3000'
-    volumes:
-      - .:/app
     env_file:
       - .env.docker
     depends_on:
       - mongo
-    command: node server/server.js
+    command: npm start
 
   mongo:
     image: mongo:7
