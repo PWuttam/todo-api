@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # 開発モードで起動（ホットリロード前提）
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
