@@ -1,48 +1,53 @@
-name: CI
+name: CI (smoke)
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
+  pull_request:
 
 jobs:
-  lint-and-test:
+  smoke:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x, 22.x]
-
-    services:
-      mongo:
-        image: mongo:7
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd="mongosh --eval 'db.adminCommand({ ping: 1 })'" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=5
-
-    env:
-      MONGODB_URI: mongodb://127.0.0.1:27017/todo_api
-      MONGO_URI: mongodb://127.0.0.1:27017/todo_api
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: npm
+          node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Prepare env for Docker Compose
+        run: |
+          cat <<'EOF' > .env.docker
+          MONGODB_URI=mongodb://mongo:27017/todo_api
+          PORT=3000
+          NODE_ENV=development
+          EOF
 
-      - name: Lint
-        run: npm run lint
+      - name: Build and start services
+        run: docker compose up -d --build
 
-      - name: Test
-        run: npm test
+      - name: Wait for API health
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:3000/health >/dev/null; then
+              echo "API is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "API did not become healthy in time" >&2
+          exit 1
+
+      - name: Run smoke.sh
+        run: bash scripts/smoke.sh
+
+      - name: Show logs (api & mongo)
+        if: always()
+        run: docker compose logs --no-color --tail=200 api mongo
+
+      - name: Tear down
+        if: always()
+        run: docker compose down
