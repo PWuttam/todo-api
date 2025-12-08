@@ -118,6 +118,28 @@ curl -X DELETE http://localhost:3000/todos/<id>
 docker compose down
 ```
 
+### 🔁 Automatic Restart (Docker)
+
+Both the API and MongoDB containers use Docker’s restart policy:
+
+```yaml
+restart: unless-stopped
+```
+
+This means:
+
+	•	If a container crashes, it will automatically restart.
+	•	If you manually stop the services using:
+  
+```bash
+  docker compose stop
+```
+
+…they will stay stopped until you manually start them again.
+
+This makes the development environment more stable and resilient.
+
+
 ### 5️⃣ Environment variables
 
 Docker development uses .env.docker.
