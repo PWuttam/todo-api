@@ -119,6 +119,26 @@ curl -X DELETE http://localhost:3000/todos/<id>
 docker compose down
 ```
 
+### 🔁 自動リスタート（Docker）
+
+API と MongoDB のコンテナには、Docker の「再起動ポリシー」が設定されています：
+
+```bash
+restart: unless-stopped
+```
+
+この設定の意味は次のとおりです：
+
+	•	コンテナが クラッシュ（異常終了）した場合は、自動で再起動します
+	•	一方、以下のように 手動で停止した場合 は再起動しません：
+  
+```bash
+docker compose stop
+```
+
+つまり、「落ちたら自動復旧、手動停止は尊重」という、扱いやすい挙動になります。
+ローカル開発環境がより安定し、トラブルに強くなります。
+
 5️⃣ Docker 用の環境変数ファイル
 
 Docker 開発用には .env.docker を使用します。
