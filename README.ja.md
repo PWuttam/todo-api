@@ -169,12 +169,26 @@ cp .env.docker .env
 
 ## 🔑 環境変数
 
-.env.example を参考に .env ファイルを作成します：
+### ローカル実行時（`.env`）
+
+.env.example を参考に .env ファイルを作成し、ホストで `npm run dev` / `npm start` するときに使います：
 
 ```bash
 MONGODB_URI=mongodb://localhost:27017/todo-api
 PORT=3000
 NODE_ENV=development
+```
+
+### Docker 実行時（`.env.docker`）
+
+- 目的: Docker 専用の環境変数ファイル（`docker-compose` の `env_file: .env.docker` でコンテナに適用）
+- 違い: `.env` はホスト実行用、`.env.docker` は Docker 用、`.env.example` は両方のひな型
+- 優先度: 実行時の `docker compose run ... -e KEY=VAL` > `.env.docker` > アプリのデフォルト値
+- 混同防止: ホストは `.env`、コンテナは `.env.docker` を使い分ける。編集後は必ず再起動する：
+
+```bash
+docker compose down
+docker compose up -d
 ```
 
 ## 📡 APIリファレンス

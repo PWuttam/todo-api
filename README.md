@@ -167,12 +167,26 @@ It will be added as part of roadmap milestone “v0.3 – CI & Testing”.
 
 ## 🔑 Environment Variables
 
-Create a .env file based on .env.example:
+### Local execution (`.env`)
+
+Create a .env file based on .env.example for running `npm run dev` / `npm start` on the host:
 
 ```bash
 MONGODB_URI=mongodb://localhost:27017/todo-api
 PORT=3000
 NODE_ENV=development
+```
+
+### Docker execution (`.env.docker`)
+
+- Purpose: Docker-specific env file applied via `docker-compose` `env_file: .env.docker` so containers get the right settings.
+- Differences: `.env` is for host runs, `.env.docker` is for Docker runs, `.env.example` is the template for both.
+- Priority: `docker compose run ... -e KEY=VAL` > `.env.docker` > app defaults.
+- Avoid mixing: use `.env` for host-only runs and `.env.docker` for container runs. After editing `.env.docker`, restart the stack:
+
+```bash
+docker compose down
+docker compose up -d
 ```
 
 ## 📡 API Reference
