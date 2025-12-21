@@ -9,6 +9,8 @@
 ## 📋 目次
 
 - [クイックスタート](#-クイックスタート)
+- [使い方](#-使い方)
+- [Makefile コマンド](#-makefile-コマンド)
 - [使用技術（Tech Stack）](#-使用技術tech-stack)
 - [環境変数](#-環境変数)
 - [APIリファレンス](#-apiリファレンス)
@@ -148,6 +150,20 @@ Docker 開発用には .env.docker を使用します。
 ```bash
 cp .env.docker .env
 ```
+
+
+## 📦 使い方
+
+リポジトリ直下で Docker Compose を使ってスタックを動かしてください。
+
+## 🛠️ Makefile コマンド
+
+すべてリポジトリ直下で実行します：
+- `make up` — スタックをバックグラウンドで起動
+- `make down` — コンテナを停止して削除
+- `make logs` — すべてのサービスのログを追跡
+- `make restart` — 一度停止してから再起動
+- `make seed` — `api` サービス内で `npm run seed` を実行
 
 ---
 

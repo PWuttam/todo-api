@@ -9,6 +9,8 @@ This project serves as a foundation for building robust backend APIs with a clea
 ## 📋 Table of Contents
 
 - [Quick Start](#-quick-start)
+- [Usage](#-usage)
+- [Makefile Commands](#-makefile-commands)
 - [Tech Stack](#-tech-stack)
 - [Environment Variables](#-environment-variables)
 - [API Reference](#-api-reference)
@@ -148,6 +150,19 @@ To customize:
 ```bash
 cp .env.docker .env
 ```
+
+## 📦 Usage
+
+Run the Docker-based stack from the repository root with Docker Compose.
+
+## 🛠️ Makefile Commands
+
+Use these shortcuts from the repository root:
+- `make up` — start the stack in detached mode.
+- `make down` — stop and remove the stack.
+- `make logs` — follow combined service logs.
+- `make restart` — recreate the stack by stopping then starting.
+- `make seed` — run `npm run seed` inside the `api` service.
 
 ## 🧰 Tech Stack
 
