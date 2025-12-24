@@ -163,6 +163,19 @@ Use these shortcuts from the repository root:
 - `make logs` — follow combined service logs.
 - `make restart` — recreate the stack by stopping then starting.
 - `make seed` — run `npm run seed` inside the `api` service.
+- `make smoke` — run the smoke test inside the `api` service.
+
+Smoke test (Docker required, containers already running):
+
+```bash
+make smoke
+```
+
+Equivalent command:
+
+```bash
+docker compose exec api ./scripts/smoke.sh
+```
 
 ## 🧰 Tech Stack
 

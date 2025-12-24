@@ -1,4 +1,4 @@
-.PHONY: up down logs restart seed
+.PHONY: up down logs restart seed smoke
 
 up:
 	docker compose up -d
@@ -14,3 +14,6 @@ restart:
 
 seed:
 	docker compose exec api npm run seed
+
+smoke:
+	docker compose exec api ./scripts/smoke.sh

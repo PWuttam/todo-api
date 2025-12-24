@@ -1,6 +1,9 @@
 # 開発用 Dockerfile（dev）
 FROM node:20-alpine
 
+# curl と jq を追加（smoke test 用）
+RUN apk add --no-cache curl jq
+
 # 作業ディレクトリ
 WORKDIR /app
 

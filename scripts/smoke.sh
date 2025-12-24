@@ -1,7 +1,9 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
-BASE_URL="${1:-http://localhost:3000}"
+sleep 5
+
+BASE_URL="${1:-http://api:3000}"
 
 echo "== Health =="
 curl -s ${BASE_URL}/ | jq .
