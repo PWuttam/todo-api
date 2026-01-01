@@ -221,13 +221,14 @@ docker compose up -d
 
 Base URL: http://localhost:3000
 
-| Method | Path         | Description      | Body (JSON)                                               |       |                         |
-| :----- | :----------- | :--------------- | :-------------------------------------------------------- | ----- | ----------------------- |
-| GET    | `/todos`     | List all todos   | —                                                         |       |                         |
-| POST   | `/todos`     | Create a todo    | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
-| GET    | `/todos/:id` | Get a todo by ID | —                                                         |       |                         |
-| PUT    | `/todos/:id` | Update a todo    | same as POST                                              |       |                         |
-| DELETE | `/todos/:id` | Delete a todo    | —                                                         |       |                         |
+| Method | Path | Description | Body (JSON) |
+| :----- | :--- | :---------- | :---------- |
+| GET | `/todos` | List all todos | — |
+| GET | `/boards/:boardId/todos` | List todos in a board | — |
+| POST | `/todos` | Create a todo | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
+| GET | `/todos/:id` | Get a todo by ID | — |
+| PUT | `/todos/:id` | Update a todo | same as POST |
+| DELETE | `/todos/:id` | Delete a todo | — |
 
 ✅ Validation handled via express-validator in route definitions.
 
@@ -243,6 +244,20 @@ curl -X POST http://localhost:3000/todos \
 
 ```bash
 curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
+```
+
+### Board-scoped todos (NexusBoard integration)
+
+Boards are treated as the primary resource for board-specific lists. The canonical endpoint is:
+
+```bash
+curl http://localhost:3000/boards/<boardId>/todos
+```
+
+For backward compatibility, `GET /todos?boardId=<id>` returns the same result. Both endpoints respond with:
+
+```json
+{ "todos": [...] }
 ```
 
 ## 🗂️ Project Structure

@@ -211,13 +211,14 @@ docker compose up -d
 
 Base URL: http://localhost:3000
 
-| メソッド | パス         | 説明           | Body（JSON）                                              |       |                         |
-| :------- | :----------- | :------------- | :-------------------------------------------------------- | ----- | ----------------------- |
-| GET      | `/todos`     | ToDo一覧を取得 | —                                                         |       |                         |
-| POST     | `/todos`     | ToDoを作成     | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
-| GET      | `/todos/:id` | ID指定で取得   | —                                                         |       |                         |
-| PUT      | `/todos/:id` | ToDoを更新     | POSTと同様                                                |       |                         |
-| DELETE   | `/todos/:id` | ToDoを削除     | —                                                         |       |                         |
+| メソッド | パス | 説明 | Body (JSON) |
+| :----- | :--- | :--- | :---------- |
+| GET | `/todos` | Todo一覧を取得 | — |
+| GET | `/boards/:boardId/todos` | Board別のTodo一覧を取得 | — |
+| POST | `/todos` | Todoを作成 | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
+| GET | `/todos/:id` | IDを指定してTodoを取得 | — |
+| PUT | `/todos/:id` | Todoを更新 | POSTと同じ |
+| DELETE | `/todos/:id` | Todoを削除 | — |
 
 ✅ バリデーションは express-validator によりルート定義時に実行されます。
 
@@ -233,6 +234,22 @@ curl -X POST http://localhost:3000/todos \
 
 ```bash
 curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
+```
+
+### Board別のTodo取得（NexusBoard連携）
+
+NexusBoardでは、Boardを単位としてTodoの一覧を扱います。
+そのため、Boardを主軸とした一覧取得用のエンドポイントを正規（canonical）として定義しています。
+
+```bash
+curl http://localhost:3000/boards/<boardId>/todos
+```
+
+後方互換性を保つため、GET /todos?boardId=<id> も同じ結果を返します。
+どちらのエンドポイントも、以下の形式でレスポンスを返します。
+
+```json
+{ "todos": [...] }
 ```
 
 ## 🗂️ プロジェクト構成

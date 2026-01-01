@@ -71,7 +71,19 @@ export const createTodo = async (req, res) => {
 export const getTodos = async (req, res, next) => {
   try {
     // クエリパラメータから検索条件や並び順、ページ番号などを取得
-    const { status, tag, q, sort = 'createdAt:desc', page = '1', limit = '20' } = req.query;
+    const {
+      status,
+      tag,
+      q,
+      sort = 'createdAt:desc',
+      page = '1',
+      limit = '20',
+      boardId,
+    } = req.query;
+    if (boardId) {
+      const todos = await todoService.getTodosByBoardId(String(boardId));
+      return res.json({ todos });
+    }
 
     // ページネーション処理
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
@@ -113,6 +125,19 @@ export const getTodos = async (req, res, next) => {
     });
   } catch (e) {
     next(e); // エラーハンドラに渡す
+  }
+};
+
+// ============================================
+// 🔸 4-2. READ（Board別のTodo一覧を取得）
+// ============================================
+export const getTodosByBoardId = async (req, res, next) => {
+  try {
+    const { boardId } = req.params;
+    const todos = await todoService.getTodosByBoardId(String(boardId));
+    res.json({ todos });
+  } catch (e) {
+    next(e);
   }
 };
 
