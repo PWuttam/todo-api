@@ -23,6 +23,11 @@ export async function getTodos(query, options) {
   return { items, total };
 }
 
+// READ（Board別のTodo一覧取得）
+export async function getTodosByBoardId(boardId) {
+  return await Todo.find({ boardId }).sort({ createdAt: -1 });
+}
+
 // UPDATE（Todo更新）
 export async function updateTodo(id, data) {
   return await Todo.findByIdAndUpdate(id, data, {

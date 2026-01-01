@@ -17,6 +17,7 @@ const todoSchema = new Schema(
       default: 'pending',
     },
     tags: { type: [String], default: [] },
+    boardId: { type: String, index: true },
   },
   { timestamps: true }
 );

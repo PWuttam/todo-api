@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { connectDB } from './config/db.js';
 import todosRouter from './routes/todos.js';
+import boardsRouter from './routes/boards.js';
 import errorHandler from './middlewares/error.js';
 import userRoutes from '../routes/userRoutes.js';
 import config from './config/index.js';
@@ -42,6 +43,7 @@ app.use(express.json());
 
 // ルート
 app.use('/todos', todosRouter);
+app.use('/boards', boardsRouter);
 
 // userRoutes を登録
 app.use('/users', userRoutes);
