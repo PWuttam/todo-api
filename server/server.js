@@ -46,7 +46,7 @@ app.use('/todos', todosRouter);
 app.use('/boards', boardsRouter);
 
 // userRoutes を登録
-app.use('/users', userRoutes);
+app.use('/', userRoutes);
 
 // 共通エラーハンドラ（最後）
 app.use(errorHandler);
