@@ -43,7 +43,7 @@ export function createApp() {
   // --- ルーター ---
   app.use('/todos', todosRouter);
   app.use('/boards', boardsRouter);
-  app.use('/users', userRoutes);
+  app.use('/', userRoutes);
 
   // --- エラーハンドラ ---
   app.use(errorHandler);

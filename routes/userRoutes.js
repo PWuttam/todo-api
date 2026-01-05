@@ -1,10 +1,14 @@
 // routes/userRoutes.js
 import express from 'express';
 import asyncHandler from '../utils/asyncHandler.js';
+import { getMe } from '../server/controllers/users.controller.js';
 
 const router = express.Router();
 
-// 確認用：通常ルート
+// GET /me - 認証済みユーザー情報を取得
+router.get('/me', asyncHandler(getMe));
+
+// 確認用:通常ルート
 router.get(
   '/',
   asyncHandler(async (req, res) => {
