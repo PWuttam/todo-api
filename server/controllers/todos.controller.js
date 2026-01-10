@@ -26,12 +26,21 @@ export const validateCreate = [
   body('status') // statusフィールドは任意
     .optional()
     .isIn(['pending', 'in-progress', 'completed']), // 許可された文字列だけ
+
+  body('priority')
+    .optional()
+    .isIn(['low', 'medium', 'high'])
+    .withMessage('priority must be low, medium, or high'),
 ];
 
 // 更新用
 export const validateUpdate = [
   body('title').optional().isString().trim().notEmpty(),
   body('status').optional().isIn(['pending', 'in-progress', 'completed']),
+  body('priority')
+    .optional()
+    .isIn(['low', 'medium', 'high'])
+    .withMessage('priority must be low, medium, or high'),
 ];
 
 // ============================================
@@ -79,6 +88,7 @@ export const getTodos = async (req, res, next) => {
       page = '1',
       limit = '20',
       boardId,
+      priority,
     } = req.query;
     if (boardId) {
       const todos = await todoService.getTodosByBoardId(String(boardId));
@@ -99,6 +109,7 @@ export const getTodos = async (req, res, next) => {
     // 検索条件を組み立て
     const query = {};
     if (status) query.status = status;
+    if (priority) query.priority = priority;
     if (tag) {
       const tags = String(tag)
         .split(',')
@@ -121,7 +132,12 @@ export const getTodos = async (req, res, next) => {
       total,
       pages: Math.ceil(total / limitNum),
       sort: `${sortField}:${sortDir === 1 ? 'asc' : 'desc'}`,
-      filters: { status: status || null, tag: tag || null, q: q || null },
+      filters: {
+        status: status || null,
+        tag: tag || null,
+        priority: priority || null,
+        q: q || null,
+      },
     });
   } catch (e) {
     next(e); // エラーハンドラに渡す
