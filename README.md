@@ -373,6 +373,7 @@ See LICENSE for details.
 ## 📘 Resources
 
 - [🇯🇵 Japanese README](./README.ja.md)
+- [📖 Codebase Overview](./docs/codebase-overview.md) - Complete guide for developers and AI assistants
 - [Developer Notes](./docs/dev-notes.md)
 - [PM Brief](./docs/pm-brief.md)
 - [Architecture Diagram](./docs/todo-api-flow-with-improvements.png)

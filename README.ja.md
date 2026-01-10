@@ -366,6 +366,7 @@ Pull Request は歓迎です！
 ## 📘 関連リソース
 
 - [🇬🇧 English README](./README.md)
+- [📖 コードベース完全ガイド](./docs/codebase-overview.md) - 開発者・AI アシスタント向け詳細ドキュメント
 - [開発者ノート](./docs/dev-notes.md)
 - [PM向け概要資料](./docs/pm-brief.md)
 - [アーキテクチャ図](./docs/todo-api-flow-with-improvements.png)
