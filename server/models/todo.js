@@ -16,6 +16,11 @@ const todoSchema = new Schema(
       enum: ['pending', 'in-progress', 'completed'],
       default: 'pending',
     },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium',
+    },
     tags: { type: [String], default: [] },
     boardId: { type: String, index: true },
   },
