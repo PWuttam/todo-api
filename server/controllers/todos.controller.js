@@ -31,6 +31,12 @@ export const validateCreate = [
     .optional()
     .isIn(['low', 'medium', 'high'])
     .withMessage('priority must be low, medium, or high'),
+
+  body('sortOrder')
+    .optional()
+    .isInt({ min: 0, max: 1000000 })
+    .withMessage('sortOrder must be a non-negative integer between 0 and 1,000,000')
+    .toInt(),
 ];
 
 // 更新用
@@ -41,6 +47,11 @@ export const validateUpdate = [
     .optional()
     .isIn(['low', 'medium', 'high'])
     .withMessage('priority must be low, medium, or high'),
+  body('sortOrder')
+    .optional()
+    .isInt({ min: 0, max: 1000000 })
+    .withMessage('sortOrder must be a non-negative integer between 0 and 1,000,000')
+    .toInt(),
 ];
 
 // ============================================
@@ -90,24 +101,31 @@ export const getTodos = async (req, res, next) => {
       boardId,
       priority,
     } = req.query;
-    if (boardId) {
-      const todos = await todoService.getTodosByBoardId(String(boardId));
-      return res.json({ todos });
-    }
 
     // ページネーション処理
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
     const limitNum = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
 
     // 並び替え対象フィールドを制限
-    const allowSort = new Set(['createdAt', 'updatedAt', 'dueDate', 'title', 'status']);
+    const allowSort = new Set([
+      'createdAt',
+      'updatedAt',
+      'dueDate',
+      'title',
+      'status',
+      'sortOrder',
+    ]);
     const [rawField, rawDir] = String(sort).split(':');
     const sortField = allowSort.has(rawField) ? rawField : 'createdAt';
     const sortDir = rawDir === 'asc' ? 1 : -1;
-    const sortObj = { [sortField]: sortDir };
+    const sortObj =
+      sortField === 'sortOrder'
+        ? { sortOrder: sortDir, createdAt: -1, _id: -1 }
+        : { [sortField]: sortDir };
 
     // 検索条件を組み立て
     const query = {};
+    if (boardId) query.boardId = String(boardId);
     if (status) query.status = status;
     if (priority) query.priority = priority;
     if (tag) {
@@ -150,7 +168,26 @@ export const getTodos = async (req, res, next) => {
 export const getTodosByBoardId = async (req, res, next) => {
   try {
     const { boardId } = req.params;
-    const todos = await todoService.getTodosByBoardId(String(boardId));
+    const { sort = 'createdAt:desc' } = req.query;
+
+    // 並び替え対象フィールドを制限
+    const allowSort = new Set([
+      'createdAt',
+      'updatedAt',
+      'dueDate',
+      'title',
+      'status',
+      'sortOrder',
+    ]);
+    const [rawField, rawDir] = String(sort).split(':');
+    const sortField = allowSort.has(rawField) ? rawField : 'createdAt';
+    const sortDir = rawDir === 'asc' ? 1 : -1;
+    const sortObj =
+      sortField === 'sortOrder'
+        ? { sortOrder: sortDir, createdAt: -1, _id: -1 }
+        : { [sortField]: sortDir };
+
+    const todos = await todoService.getTodosByBoardId(String(boardId), { sort: sortObj });
     res.json({ todos });
   } catch (e) {
     next(e);

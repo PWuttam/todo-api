@@ -23,6 +23,7 @@ const todoSchema = new Schema(
     },
     tags: { type: [String], default: [] },
     boardId: { type: String, index: true },
+    sortOrder: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
@@ -30,6 +31,7 @@ const todoSchema = new Schema(
 // 検索・並び替えのパフォーマンス向上
 todoSchema.index({ status: 1, dueDate: 1, createdAt: -1 });
 todoSchema.index({ title: 'text' }); // タイトル検索（text検索を使う場合）
+todoSchema.index({ boardId: 1, sortOrder: 1, createdAt: -1 }); // Board別のsortOrder検索
 
 // ✅ ESMでは export default を使用
 export default model('Todo', todoSchema);
