@@ -24,8 +24,9 @@ export async function getTodos(query, options) {
 }
 
 // READ（Board別のTodo一覧取得）
-export async function getTodosByBoardId(boardId) {
-  return await Todo.find({ boardId }).sort({ createdAt: -1 });
+export async function getTodosByBoardId(boardId, options = {}) {
+  const { sort = { createdAt: -1 } } = options;
+  return await Todo.find({ boardId }).sort(sort);
 }
 
 // UPDATE（Todo更新）

@@ -129,4 +129,73 @@ describe('Todos API', () => {
 
     assert.equal(updated.body.priority, 'high');
   });
+
+  test('rejects invalid sortOrder values', async () => {
+    const invalidValues = [-1, 1.5, 1000001, 'abc'];
+    for (const sortOrder of invalidValues) {
+      const res = await request(app)
+        .post('/todos')
+        .send({ title: 'Invalid sortOrder', sortOrder })
+        .expect(400);
+
+      assert.ok(res.body.error);
+    }
+  });
+
+  test('accepts boundary sortOrder values', async () => {
+    const minRes = await request(app)
+      .post('/todos')
+      .send({ title: 'Min sortOrder', sortOrder: 0 })
+      .expect(201);
+    assert.equal(minRes.body.sortOrder, 0);
+
+    const maxRes = await request(app)
+      .post('/todos')
+      .send({ title: 'Max sortOrder', sortOrder: 1000000 })
+      .expect(201);
+    assert.equal(maxRes.body.sortOrder, 1000000);
+  });
+
+  test('returns deterministic ordering for identical sortOrder', async () => {
+    const created = [];
+    created.push(await request(app).post('/todos').send({ title: 'A', sortOrder: 10 }).expect(201));
+    created.push(await request(app).post('/todos').send({ title: 'B', sortOrder: 10 }).expect(201));
+    created.push(await request(app).post('/todos').send({ title: 'C', sortOrder: 10 }).expect(201));
+
+    const expectedOrder = [created[2].body._id, created[1].body._id, created[0].body._id];
+
+    const first = await request(app).get('/todos?sort=sortOrder:asc').expect(200);
+    const second = await request(app).get('/todos?sort=sortOrder:asc').expect(200);
+
+    const firstIds = first.body.items.map((item) => item._id);
+    const secondIds = second.body.items.map((item) => item._id);
+
+    assert.deepEqual(firstIds, expectedOrder);
+    assert.deepEqual(secondIds, expectedOrder);
+  });
+
+  test('returns consistent ordering for board-scoped queries', async () => {
+    const boardId = 'board-1';
+    await request(app).post('/todos').send({ title: 'B-2', boardId, sortOrder: 2 }).expect(201);
+    await request(app).post('/todos').send({ title: 'B-1', boardId, sortOrder: 1 }).expect(201);
+    await request(app).post('/todos').send({ title: 'B-3', boardId, sortOrder: 3 }).expect(201);
+    await request(app)
+      .post('/todos')
+      .send({ title: 'Other board', boardId: 'board-2', sortOrder: 1 })
+      .expect(201);
+
+    const listRes = await request(app)
+      .get(`/todos?boardId=${boardId}&sort=sortOrder:asc`)
+      .expect(200);
+    const boardRes = await request(app)
+      .get(`/boards/${boardId}/todos?sort=sortOrder:asc`)
+      .expect(200);
+
+    const listIds = listRes.body.items.map((item) => item._id);
+    const boardIds = boardRes.body.todos.map((item) => item._id);
+
+    assert.equal(listRes.body.total, 3);
+    assert.equal(listRes.body.items.length, 3);
+    assert.deepEqual(listIds, boardIds);
+  });
 });
