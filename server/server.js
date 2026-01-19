@@ -38,7 +38,39 @@ app.get('/', (_req, res) => res.json({ ok: true }));
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-app.use(cors());
+// CORS設定: 開発環境は全許可、本番環境はALLOWED_ORIGINSのみ許可
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Non-browser requests (curl, server-to-server) have no origin
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Development: allow all origins
+    if (config.nodeEnv !== 'production') {
+      return callback(null, true);
+    }
+
+    // Production: check against ALLOWED_ORIGINS
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',')
+          .map((o) => o.trim())
+          .filter(Boolean)
+      : [];
+
+    if (allowedOrigins.length === 0) {
+      return callback(new Error('CORS rejected: ALLOWED_ORIGINS not configured for production'));
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS rejected: origin ${origin} not allowed`));
+  },
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // ルート
