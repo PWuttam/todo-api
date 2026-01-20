@@ -23,7 +23,19 @@ app.use(morgan('combined'));
 // 例: ::1 - GET /users 200 15 - 2.345 ms
 
 // セキュリティヘッダーを有効化
-app.use(helmet());
+// HSTS is disabled by default and enabled only in production (see below)
+app.use(helmet({ hsts: false }));
+
+// HSTS (HTTP Strict-Transport-Security): 本番環境のみ有効化
+// 開発・テスト環境ではHTTPSが利用できないことがあるため、HSTSを無効にする
+if (process.env.NODE_ENV === 'production') {
+  app.use(
+    helmet.hsts({
+      maxAge: 31536000, // 1 year in seconds
+      includeSubDomains: true,
+    })
+  );
+}
 
 // 🚫 アクセス制限（DoS対策）
 const limiter = rateLimit({
