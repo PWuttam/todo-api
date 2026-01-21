@@ -10,6 +10,7 @@ import boardsRouter from './routes/boards.js';
 import errorHandler from './middlewares/error.js';
 import userRoutes from '../routes/userRoutes.js';
 import config from './config/index.js';
+import buildCspDirectives from './config/csp.js';
 
 console.log('🌱 NODE_ENV:', config.nodeEnv);
 
@@ -24,7 +25,18 @@ app.use(morgan('combined'));
 
 // セキュリティヘッダーを有効化
 // HSTS is disabled by default and enabled only in production (see below)
-app.use(helmet({ hsts: false }));
+app.use(
+  helmet({
+    hsts: false,
+    contentSecurityPolicy: false,
+  })
+);
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: false,
+    directives: buildCspDirectives(),
+  })
+);
 
 // HSTS (HTTP Strict-Transport-Security): 本番環境のみ有効化
 // 開発・テスト環境ではHTTPSが利用できないことがあるため、HSTSを無効にする

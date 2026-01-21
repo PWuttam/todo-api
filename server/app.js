@@ -10,6 +10,7 @@ import boardsRouter from './routes/boards.js';
 import errorHandler from './middlewares/error.js';
 import userRoutes from '../routes/userRoutes.js';
 import config from './config/index.js';
+import buildCspDirectives from './config/csp.js';
 
 export function createApp() {
   const app = express();
@@ -20,7 +21,17 @@ export function createApp() {
   app.use(morgan('combined'));
 
   // --- セキュリティ ---
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    })
+  );
+  app.use(
+    helmet.contentSecurityPolicy({
+      useDefaults: false,
+      directives: buildCspDirectives(),
+    })
+  );
 
   // --- レートリミット（DoS対策）---
   const limiter = rateLimit({
