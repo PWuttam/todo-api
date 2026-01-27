@@ -54,6 +54,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15分
   max: 100, // 各IPごとに最大100リクエスト
   message: 'Too many requests, please try again later.',
+  skip: (req) => req.path === '/health',
 });
 app.use(limiter);
 
