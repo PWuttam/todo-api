@@ -50,13 +50,19 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // 🚫 アクセス制限（DoS対策）
-const limiter = rateLimit({
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15分
   max: 100, // 各IPごとに最大100リクエスト
   message: 'Too many requests, please try again later.',
   skip: (req) => req.path === '/health',
 });
-app.use(limiter);
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15分
+  max: 5, // 各IPごとに最大5リクエスト
+  message: 'Too many authentication attempts, please try again later.',
+});
+app.use('/auth', authLimiter);
+app.use(generalLimiter);
 
 // ルート（トップページ）
 app.get('/', (_req, res) => res.json({ ok: true }));
