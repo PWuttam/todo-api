@@ -2,11 +2,12 @@
 import express from 'express';
 import asyncHandler from '../utils/asyncHandler.js';
 import { getMe } from '../server/controllers/users.controller.js';
+import auth from '../server/middlewares/auth.js';
 
 const router = express.Router();
 
 // GET /me - 認証済みユーザー情報を取得
-router.get('/me', asyncHandler(getMe));
+router.get('/me', auth, asyncHandler(getMe));
 
 // 確認用:通常ルート
 router.get(
