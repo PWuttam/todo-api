@@ -16,6 +16,9 @@ export default function auth(req, res, next) {
 
   try {
     const payload = jwt.verify(token, secret);
+    if (payload.tokenType && payload.tokenType !== 'access') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
     req.user = payload;
     return next();
   } catch (err) {

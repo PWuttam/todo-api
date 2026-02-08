@@ -9,6 +9,7 @@ import todosRouter from './routes/todos.js';
 import boardsRouter from './routes/boards.js';
 import errorHandler from './middlewares/error.js';
 import userRoutes from '../routes/userRoutes.js';
+import authRoutes from './routes/auth.js';
 import config from './config/index.js';
 import buildCspDirectives from './config/csp.js';
 
@@ -105,6 +106,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // ルート
+app.use('/auth', authRoutes);
 app.use('/todos', todosRouter);
 app.use('/boards', boardsRouter);
 
