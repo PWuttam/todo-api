@@ -1,6 +1,10 @@
 // server/controllers/auth.controller.js
 import { body, validationResult } from 'express-validator';
-import { createAccessToken, verifyRefreshToken } from '../services/auth.service.js';
+import {
+  createAccessToken,
+  rotateRefreshToken,
+  revokeRefreshToken,
+} from '../services/auth.service.js';
 
 export const validateRefresh = [
   body('refreshToken')
@@ -24,28 +28,45 @@ export const handleValidation = (req, res, next) => {
 export const refreshAccessToken = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
-    const payload = verifyRefreshToken(refreshToken);
+    const { payload, refreshToken: nextRefreshToken } =
+      await rotateRefreshToken(refreshToken);
 
     if (payload.tokenType && payload.tokenType !== 'refresh') {
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    const {
-      tokenType,
-      iat,
-      exp,
-      nbf,
-      iss,
-      aud,
-      sub,
-      jti,
-      ...userPayload
-    } = payload;
+    const { tokenType, iat, exp, nbf, iss, aud, sub, jti, ...userPayload } = payload;
 
     const accessToken = createAccessToken(userPayload);
-    return res.json({ accessToken, tokenType: 'Bearer' });
+    return res.json({ accessToken, refreshToken: nextRefreshToken });
   } catch (e) {
-    if (e.name === 'TokenExpiredError' || e.name === 'JsonWebTokenError') {
+    if (
+      e.name === 'TokenExpiredError' ||
+      e.name === 'JsonWebTokenError' ||
+      e.name === 'InvalidRefreshTokenError'
+    ) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    return next(e);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+    const revoked = await revokeRefreshToken(refreshToken);
+
+    if (!revoked) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    return res.status(204).send();
+  } catch (e) {
+    if (
+      e.name === 'TokenExpiredError' ||
+      e.name === 'JsonWebTokenError' ||
+      e.name === 'InvalidRefreshTokenError'
+    ) {
       return res.status(401).json({ error: 'Invalid token' });
     }
     return next(e);
