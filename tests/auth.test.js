@@ -47,6 +47,8 @@ describe('Auth refresh rotation and logout', () => {
 
     assert.ok(first.body.accessToken);
     assert.ok(first.body.refreshToken);
+    assert.ok(first.body.tokenType);
+    assert.equal(first.body.tokenType, 'Bearer');
     assert.notEqual(first.body.refreshToken, refreshToken);
 
     await request(app).post('/auth/refresh').send({ refreshToken }).expect(401);

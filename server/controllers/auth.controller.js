@@ -6,6 +6,8 @@ import {
   revokeRefreshToken,
 } from '../services/auth.service.js';
 
+const TOKEN_TYPE = 'Bearer';
+
 export const validateRefresh = [
   body('refreshToken')
     .isString()
@@ -38,7 +40,11 @@ export const refreshAccessToken = async (req, res, next) => {
     const { tokenType, iat, exp, nbf, iss, aud, sub, jti, ...userPayload } = payload;
 
     const accessToken = createAccessToken(userPayload);
-    return res.json({ accessToken, refreshToken: nextRefreshToken });
+    return res.json({
+      accessToken,
+      refreshToken: nextRefreshToken,
+      tokenType: TOKEN_TYPE,
+    });
   } catch (e) {
     if (
       e.name === 'TokenExpiredError' ||
