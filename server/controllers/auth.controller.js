@@ -6,12 +6,10 @@ import {
   revokeRefreshToken,
 } from '../services/auth.service.js';
 
+const TOKEN_TYPE = 'Bearer';
+
 export const validateRefresh = [
-  body('refreshToken')
-    .isString()
-    .trim()
-    .notEmpty()
-    .withMessage('refreshToken is required'),
+  body('refreshToken').isString().trim().notEmpty().withMessage('refreshToken is required'),
 ];
 
 export const handleValidation = (req, res, next) => {
@@ -28,8 +26,7 @@ export const handleValidation = (req, res, next) => {
 export const refreshAccessToken = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
-    const { payload, refreshToken: nextRefreshToken } =
-      await rotateRefreshToken(refreshToken);
+    const { payload, refreshToken: nextRefreshToken } = await rotateRefreshToken(refreshToken);
 
     if (payload.tokenType && payload.tokenType !== 'refresh') {
       return res.status(401).json({ error: 'Invalid token' });
@@ -38,7 +35,11 @@ export const refreshAccessToken = async (req, res, next) => {
     const { tokenType, iat, exp, nbf, iss, aud, sub, jti, ...userPayload } = payload;
 
     const accessToken = createAccessToken(userPayload);
-    return res.json({ accessToken, refreshToken: nextRefreshToken });
+    return res.json({
+      accessToken,
+      refreshToken: nextRefreshToken,
+      tokenType: TOKEN_TYPE,
+    });
   } catch (e) {
     if (
       e.name === 'TokenExpiredError' ||
