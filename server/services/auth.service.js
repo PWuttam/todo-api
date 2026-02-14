@@ -34,8 +34,7 @@ export const createRefreshToken = (payload) =>
 
 export const verifyRefreshToken = (token) => jwt.verify(token, getRefreshSecret());
 
-export const hashRefreshToken = (token) =>
-  crypto.createHash('sha256').update(token).digest('hex');
+export const hashRefreshToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
 const createInvalidRefreshTokenError = () => {
   const error = new Error('Invalid refresh token');

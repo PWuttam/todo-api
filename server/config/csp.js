@@ -26,10 +26,7 @@ const buildCspDirectives = () => {
     ["'self'", 'data:', 'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com'],
     splitSources(process.env.CSP_IMG_SRC)
   );
-  const connectSrc = mergeSources(
-    ["'self'"],
-    splitSources(process.env.CSP_CONNECT_SRC)
-  );
+  const connectSrc = mergeSources(["'self'"], splitSources(process.env.CSP_CONNECT_SRC));
 
   return {
     defaultSrc: ["'self'"],

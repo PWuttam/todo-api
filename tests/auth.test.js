@@ -40,10 +40,7 @@ describe('Auth refresh rotation and logout', () => {
   test('rotates refresh token and invalidates the old one', async () => {
     const { refreshToken } = await issueRefreshToken({ id: 'user-1', email: 'a@example.com' });
 
-    const first = await request(app)
-      .post('/auth/refresh')
-      .send({ refreshToken })
-      .expect(200);
+    const first = await request(app).post('/auth/refresh').send({ refreshToken }).expect(200);
 
     assert.ok(first.body.accessToken);
     assert.ok(first.body.refreshToken);
