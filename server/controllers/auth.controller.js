@@ -26,7 +26,10 @@ export const handleValidation = (req, res, next) => {
 export const refreshAccessToken = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
-    const { payload, refreshToken: nextRefreshToken } = await rotateRefreshToken(refreshToken);
+    const { payload, refreshToken: nextRefreshToken } = await rotateRefreshToken(refreshToken, {
+      ip: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     if (payload.tokenType && payload.tokenType !== 'refresh') {
       return res.status(401).json({ error: 'Invalid token' });
@@ -41,6 +44,13 @@ export const refreshAccessToken = async (req, res, next) => {
       tokenType: TOKEN_TYPE,
     });
   } catch (e) {
+    if (e.name === 'RefreshTokenReuseDetectedError') {
+      return res.status(e.status || 403).json({
+        error: e.message,
+        errorCode: e.errorCode || 'REFRESH_TOKEN_REUSE',
+      });
+    }
+
     if (
       e.name === 'TokenExpiredError' ||
       e.name === 'JsonWebTokenError' ||
