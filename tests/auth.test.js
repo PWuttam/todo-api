@@ -41,7 +41,7 @@ beforeEach(async () => {
 });
 
 describe('Auth refresh rotation and logout', () => {
-  test('rotates refresh token and invalidates the old one', async () => {
+  test('rotates refresh token and treats old token replay as reuse', async () => {
     const { refreshToken } = await issueRefreshToken({ id: 'user-1', email: 'a@example.com' });
 
     const first = await request(app).post('/auth/refresh').send({ refreshToken }).expect(200);
@@ -67,7 +67,8 @@ describe('Auth refresh rotation and logout', () => {
     assert.equal(newToken.parentJti, oldToken.jti);
     assert.equal(newToken.familyId, oldToken.familyId);
 
-    await request(app).post('/auth/refresh').send({ refreshToken }).expect(401);
+    const reuse = await request(app).post('/auth/refresh').send({ refreshToken }).expect(403);
+    assert.equal(reuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
   });
 
   test('logout revokes the refresh token', async () => {
@@ -75,7 +76,8 @@ describe('Auth refresh rotation and logout', () => {
 
     await request(app).post('/auth/logout').send({ refreshToken }).expect(204);
 
-    await request(app).post('/auth/refresh').send({ refreshToken }).expect(401);
+    const reuse = await request(app).post('/auth/refresh').send({ refreshToken }).expect(403);
+    assert.equal(reuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
   });
 
   test('reusing a rotated refresh token revokes all user tokens and records security event', async () => {
@@ -99,19 +101,20 @@ describe('Auth refresh rotation and logout', () => {
       .send({ refreshToken: firstToken })
       .expect(403);
     assert.equal(reuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
+    const decoded = jwt.decode(firstToken);
 
     const tokens = await RefreshToken.find({ userId: 'user-3' }).lean();
     assert.ok(tokens.length >= 3);
-    assert.ok(tokens.every((token) => token.status === 'revoked'));
-    assert.ok(tokens.every((token) => token.revokedReason === 'reuse_detected'));
+    assert.ok(tokens.every((token) => token.status !== 'active'));
+    assert.ok(tokens.some((token) => token.revokedReason === 'reuse_detected'));
+    const firstTokenRecord = tokens.find((token) => token.jti === decoded.jti);
+    assert.equal(firstTokenRecord.revokedReason, 'rotated');
 
     const events = await SecurityEvent.find({
       userId: 'user-3',
       eventType: 'refresh_token_reuse_detected',
     }).lean();
     assert.equal(events.length, 1);
-
-    const decoded = jwt.decode(firstToken);
     assert.equal(events[0].jti, decoded.jti);
 
     await request(app)
@@ -135,13 +138,22 @@ describe('Auth refresh rotation and logout', () => {
 
     const tokens = await RefreshToken.find({ userId: 'user-4' }).lean();
     assert.ok(tokens.length >= 2);
-    assert.ok(tokens.every((token) => token.status === 'revoked'));
-    assert.ok(tokens.every((token) => token.revokedReason === 'reuse_detected'));
+    assert.ok(tokens.every((token) => token.status !== 'active'));
+    const decoded = jwt.decode(refreshToken);
+    const logoutToken = tokens.find((token) => token.jti === decoded.jti);
+    assert.equal(logoutToken.revokedReason, 'logout');
+    assert.ok(tokens.some((token) => token.revokedReason === 'reuse_detected'));
 
     const event = await SecurityEvent.findOne({
       userId: 'user-4',
       eventType: 'refresh_token_reuse_detected',
     }).lean();
     assert.ok(event);
+
+    const followupTokenReuse = await request(app)
+      .post('/auth/refresh')
+      .send({ refreshToken })
+      .expect(403);
+    assert.equal(followupTokenReuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
   });
 });

@@ -98,7 +98,7 @@ const revokeAllRefreshTokensForUser = async (userId, reason, now = new Date()) =
   await RefreshToken.updateMany(
     {
       userId,
-      $or: [{ status: { $ne: 'revoked' } }, { status: { $exists: false } }, { revokedAt: null }],
+      $or: [{ status: 'active' }, { status: { $exists: false }, revokedAt: null }],
     },
     {
       $set: {

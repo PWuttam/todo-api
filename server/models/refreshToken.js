@@ -20,7 +20,7 @@ const refreshTokenSchema = new Schema(
     revokedReason: { type: String, default: null },
     usedAt: { type: Date, default: null },
     revokedAt: { type: Date, default: null },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
   },
   { timestamps: true }
 );
