@@ -29,7 +29,6 @@ This project serves as a foundation for building robust backend APIs with a clea
 ### 1️⃣ Install dependencies
 
 ```bash
-cd server
 npm install
 ```
 
@@ -48,12 +47,12 @@ npm run dev
 ```
 
 Default URL:
-➡️ http://localhost:3000
+➡️ http://localhost:3001
 
 Health check：
 
 ```bash
-curl -s http://localhost:3000/todos | jq .
+curl -s http://localhost:3001/health | jq .
 ```
 
 ## 🐳 Run with Docker (API + MongoDB)
@@ -75,7 +74,7 @@ This will launch:
 ### 2️⃣ Check if the API is running
 
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:3001/health
 ```
 
 Expected response:
@@ -86,24 +85,33 @@ Expected response:
 
 ### 3️⃣ Try the API using curl
 
+`/todos` and `/boards` endpoints require a Bearer access token.
+
+```bash
+export ACCESS_TOKEN="<accessToken>"
+```
+
 Create a todo
 
 ```bash
-curl -X POST http://localhost:3000/todos \
+curl -X POST http://localhost:3001/todos \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"title":"Docker todo","completed":false}'
+  -d '{"title":"Docker todo","status":"pending"}'
 ```
 
 Get all todos
 
 ```bash
-curl http://localhost:3000/todos
+curl http://localhost:3001/todos \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
 Update a todo
 
 ```bash
-curl -X PUT http://localhost:3000/todos/<id> \
+curl -X PUT http://localhost:3001/todos/<id> \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title":"Updated","status":"completed"}'
 ```
@@ -111,7 +119,8 @@ curl -X PUT http://localhost:3000/todos/<id> \
 Delete a todo
 
 ```bash
-curl -X DELETE http://localhost:3000/todos/<id>
+curl -X DELETE http://localhost:3001/todos/<id> \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
 ### 4️⃣ Stop containers
@@ -188,10 +197,9 @@ docker compose exec api ./scripts/smoke.sh
 | Config         | dotenv                    |
 | Error Handling | Custom middleware         |
 | Dev Tools      | Nodemon, ESLint, Prettier |
-| Testing        | Jest (planned)            |
+| Testing        | node:test + Supertest     |
 
-ℹ️ Continuous Integration (CI) via GitHub Actions is not yet configured.
-It will be added as part of roadmap milestone “v0.3 – CI & Testing”.
+ℹ️ CI is configured with GitHub Actions (`.github/workflows/ci.yml`) for smoke checks.
 
 ## 🔑 Environment Variables
 
@@ -200,9 +208,12 @@ It will be added as part of roadmap milestone “v0.3 – CI & Testing”.
 Create a .env file based on .env.example for running `npm run dev` / `npm start` on the host:
 
 ```bash
-MONGODB_URI=mongodb://localhost:27017/todo-api
-PORT=3000
+MONGODB_URI=mongodb://127.0.0.1:27017/todo_api
+PORT=3001
 NODE_ENV=development
+JWT_SECRET=change-me
+# Optional (falls back to JWT_SECRET if omitted)
+JWT_REFRESH_SECRET=change-me
 ```
 
 ### Docker execution (`.env.docker`)
@@ -219,31 +230,39 @@ docker compose up -d
 
 ## 📡 API Reference
 
-Base URL: http://localhost:3000
+Base URL: http://localhost:3001
+
+Auth note: `/todos`, `/boards`, and `/me` require `Authorization: Bearer <accessToken>`.
 
 | Method | Path | Description | Body (JSON) |
 | :----- | :--- | :---------- | :---------- |
+| GET | `/health` | Health check | — |
+| GET | `/me` | Get authenticated user profile | — |
+| GET | `/boards` | List boards | — |
 | GET | `/todos` | List all todos | — |
 | GET | `/boards/:boardId/todos` | List todos in a board | — |
-| POST | `/todos` | Create a todo | `{ "title": "string", "description": "?", "status": "todo | doing | done", "tags": ["?"] }` |
-| GET | `/todos/:id` | Get a todo by ID | — |
+| POST | `/todos` | Create a todo | `{ "title": "string", "description": "?", "status": "pending | in-progress | completed", "tags": ["?"] }` |
 | PUT | `/todos/:id` | Update a todo | same as POST |
 | DELETE | `/todos/:id` | Delete a todo | — |
+| POST | `/auth/refresh` | Rotate refresh token | `{ "refreshToken": "string" }` |
+| POST | `/auth/logout` | Revoke refresh token | `{ "refreshToken": "string" }` |
 
 ✅ Validation handled via express-validator in route definitions.
 
 ### Example
 
 ```bash
-curl -X POST http://localhost:3000/todos \
+curl -X POST http://localhost:3001/todos \
+  -H "Authorization: Bearer <accessToken>" \
   -H "Content-Type: application/json" \
-  -d '{ "title": "Write README", "status": "todo" }'
+  -d '{ "title": "Write README", "status": "pending" }'
 ```
 
 ### Optional query filters
 
 ```bash
-curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10"
+curl "http://localhost:3001/todos?status=pending&tag=work,urgent&q=readme&sort=dueDate:asc&page=1&limit=10" \
+  -H "Authorization: Bearer <accessToken>"
 ```
 
 ### Board-scoped todos (NexusBoard integration)
@@ -251,7 +270,8 @@ curl "http://localhost:3000/todos?status=pending&tag=work,urgent&q=readme&sort=d
 Boards are treated as the primary resource for board-specific lists. The canonical endpoint is:
 
 ```bash
-curl http://localhost:3000/boards/<boardId>/todos
+curl http://localhost:3001/boards/<boardId>/todos \
+  -H "Authorization: Bearer <accessToken>"
 ```
 
 For backward compatibility, `GET /todos?boardId=<id>` returns the same result. Both endpoints respond with:
@@ -259,6 +279,11 @@ For backward compatibility, `GET /todos?boardId=<id>` returns the same result. B
 ```json
 { "todos": [...] }
 ```
+
+### Refresh token reuse detection (#77)
+
+When a rotated/revoked refresh token is replayed, `/auth/refresh` returns `403` with `errorCode: "REFRESH_TOKEN_REUSE"`.
+See: [docs/auth-refresh-token-reuse.md](./docs/auth-refresh-token-reuse.md)
 
 ## 🗂️ Project Structure
 
@@ -318,22 +343,32 @@ todo-api/
 
 ## 🧪 Development Scripts
 
-From the server/ directory:
+From the repository root:
 
 ```bash
 npm run dev     # start server with nodemon
 npm start       # start normally (production-like)
-npm test        # placeholder — testing framework (Jest) not yet implemented
+npm run lint    # run ESLint + Prettier checks
+npm test        # run node:test suites
 ```
 
-### Seed sample data
-
-For testing with mock data:
+Targeted test execution:
 
 ```bash
-cd server
-npm run seed:reset                 # reset to fixed 10 records
-npm run seed:gen -- --count 40     # generate up to 40 random records
+node --test tests/todos.test.js
+node --test tests/auth.test.js
+```
+
+### Migration script (#77)
+
+```bash
+npm run migrate:token-reuse-77
+```
+
+### Seed sample data (Docker)
+
+```bash
+make seed
 ```
 
 ## ⚠️ Error Handling
@@ -346,14 +381,16 @@ All errors are normalized through middlewares/error.js.
 
 ## 🧭 Roadmap / Improvements
 
-- 🧪 Add automated tests (Jest + Supertest)
-- 🧹 Enforce ESLint + Prettier in CI
+Done:
+- ✅ node:test + Supertest test suites
+- ✅ Security middlewares (morgan, helmet, CORS, rate limiting)
+- ✅ GitHub Actions smoke CI
+
+Next:
 - ⚙️ Add async route wrapper for clean error flow
 - 📘 Integrate Swagger/OpenAPI at /docs
-- 🔍 Add morgan (HTTP logs) + winston (app logs)
-- 🛡 Add helmet, CORS rules, rate limiting
 - 🔧 Introduce config loader by environment
-- 🚀 CI/CD: run smoke + test via GitHub Actions
+- 🚀 Expand CI to run smoke + full tests
 
 ## 📘 Docs
 
@@ -374,6 +411,7 @@ See LICENSE for details.
 
 - [🇯🇵 Japanese README](./README.ja.md)
 - [📖 Codebase Overview](./docs/codebase-overview.md) - Complete guide for developers and AI assistants
+- [🔐 Refresh Token Reuse Detection](./docs/auth-refresh-token-reuse.md)
 - [Developer Notes](./docs/dev-notes.md)
 - [PM Brief](./docs/pm-brief.md)
 - [Architecture Diagram](./docs/todo-api-flow-with-improvements.png)
@@ -395,9 +433,9 @@ git push origin docs/refresh-readme
 
 ## ✅ Notes
 
-- CI not yet configured — transparency added
-- npm test clearly marked as placeholder
-- .env.example alignment verified
+- CI smoke workflow is configured (`.github/workflows/ci.yml`)
+- `npm test` runs `node --test`
+- Refresh token reuse behavior is documented in `docs/auth-refresh-token-reuse.md`
 - Topics: consider adding
 - nodejs, express, mongodb, mongoose, rest-api, backend, portfolio, javascript
 - under repository About → Edit Topics
