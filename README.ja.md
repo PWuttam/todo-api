@@ -356,15 +356,20 @@ todo-api/
 npm run dev     # nodemonで開発モード起動
 npm start       # 通常起動（本番想定）
 npm run lint    # ESLint + Prettierチェック
-npm test        # node:test スイート実行
+npm test        # Jest + Supertest テスト実行
 ```
 
 個別テスト実行:
 
 ```bash
-node --test tests/todos.test.js
-node --test tests/auth.test.js
+npx jest tests/todos.test.js --runInBand
+npx jest tests/smoke.e2e.test.js --runInBand
 ```
+
+Issue #7 のテスト範囲:
+- `tests/todos.test.js`: Todo CRUD の happy path と代表的な validation error を確認
+- `tests/smoke.e2e.test.js`: `create -> list -> update -> delete` の通しシナリオを確認
+- `tests/auth.test.js` は `node:test` ベースの既存テストとして別実行
 
 ### マイグレーション（#77）
 

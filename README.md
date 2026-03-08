@@ -349,15 +349,20 @@ From the repository root:
 npm run dev     # start server with nodemon
 npm start       # start normally (production-like)
 npm run lint    # run ESLint + Prettier checks
-npm test        # run node:test suites
+npm test        # run Jest + Supertest suites
 ```
 
 Targeted test execution:
 
 ```bash
-node --test tests/todos.test.js
-node --test tests/auth.test.js
+npx jest tests/todos.test.js --runInBand
+npx jest tests/smoke.e2e.test.js --runInBand
 ```
+
+Issue #7 test scope:
+- `tests/todos.test.js`: covers Todo CRUD happy paths and a representative validation error.
+- `tests/smoke.e2e.test.js`: covers one end-to-end flow (`create -> list -> update -> delete`).
+- `tests/auth.test.js` still exists as a `node:test` suite and is run separately.
 
 ### Migration script (#77)
 
