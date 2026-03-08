@@ -41,6 +41,20 @@ export default [
     },
   },
 
+  {
+    files: ['tests/**/*.test.js'],
+    languageOptions: {
+      globals: {
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        describe: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+      },
+    },
+  },
+
   prettier,
 
   {

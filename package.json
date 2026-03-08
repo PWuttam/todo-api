@@ -6,7 +6,7 @@
     "start": "node server/server.js",
     "dev": "nodemon server/server.js",
     "lint": "eslint .",
-    "test": "node --test",
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "migrate:token-reuse-77": "node scripts/migrations/20260223-token-reuse-detection-77.js"
   },
   "dependencies": {
@@ -31,6 +31,7 @@
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4",
