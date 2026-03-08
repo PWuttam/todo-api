@@ -232,6 +232,14 @@ docker compose up -d
 
 Base URL: http://localhost:3001
 
+OpenAPI docs:
+- Swagger UI: [http://localhost:3001/docs](http://localhost:3001/docs)
+- Scope: currently implemented `/todos` endpoints.
+
+Keep OpenAPI in sync:
+1. When `/todos` request/response/validation changes, update the OpenAPI annotations in `server/routes/todos.js` in the same change.
+2. Restart the API (`npm run dev` or `npm start`) and verify `/docs` matches real behavior.
+
 Auth note: `/todos`, `/boards`, and `/me` require `Authorization: Bearer <accessToken>`.
 
 | Method | Path | Description | Body (JSON) |

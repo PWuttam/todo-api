@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
 import { connectDB } from './config/db.js';
 import todosRouter from './routes/todos.js';
 import boardsRouter from './routes/boards.js';
@@ -12,6 +13,7 @@ import userRoutes from '../routes/userRoutes.js';
 import authRoutes from './routes/auth.js';
 import config from './config/index.js';
 import buildCspDirectives from './config/csp.js';
+import openapiSpec from './config/openapi.js';
 
 console.log('🌱 NODE_ENV:', config.nodeEnv);
 
@@ -104,6 +106,29 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+const docsCspDirectives = {
+  defaultSrc: ["'self'"],
+  scriptSrc: ["'self'", "'unsafe-inline'"],
+  styleSrc: ["'self'", "'unsafe-inline'"],
+  imgSrc: ["'self'", 'data:'],
+  fontSrc: ["'self'", 'data:'],
+  connectSrc: ["'self'"],
+  objectSrc: ["'none'"],
+  baseUri: ["'self'"],
+  frameAncestors: ["'none'"],
+  formAction: ["'self'"],
+};
+
+app.use(
+  '/docs',
+  helmet.contentSecurityPolicy({ useDefaults: false, directives: docsCspDirectives }),
+  swaggerUi.serve,
+  swaggerUi.setup(openapiSpec, {
+    explorer: true,
+    customSiteTitle: 'Todo API Docs',
+  })
+);
 
 // ルート
 app.use('/auth', authRoutes);
