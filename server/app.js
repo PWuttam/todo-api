@@ -13,6 +13,7 @@ import userRoutes from '../routes/userRoutes.js';
 import authRoutes from './routes/auth.js';
 import config from './config/index.js';
 import buildCspDirectives from './config/csp.js';
+import { createCorsOptions } from './config/cors.js';
 import openapiSpec from './config/openapi.js';
 
 export function createApp() {
@@ -52,7 +53,12 @@ export function createApp() {
   app.get('/health', (_req, res) => res.json({ ok: true }));
 
   // --- 基本設定 ---
-  app.use(cors());
+  const corsOptions = createCorsOptions({
+    nodeEnv: config.nodeEnv,
+    corsOrigin: config.corsOrigin,
+  });
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
   app.use(express.json());
 
   const docsCspDirectives = {

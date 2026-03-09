@@ -197,7 +197,7 @@ docker compose exec api ./scripts/smoke.sh
 | Config         | dotenv                    |
 | Error Handling | Custom middleware         |
 | Dev Tools      | Nodemon, ESLint, Prettier |
-| Testing        | node:test + Supertest     |
+| Testing        | Jest + Supertest          |
 
 ℹ️ CI is configured with GitHub Actions (`.github/workflows/ci.yml`) for smoke checks.
 
@@ -214,7 +214,14 @@ NODE_ENV=development
 JWT_SECRET=change-me
 # Optional (falls back to JWT_SECRET if omitted)
 JWT_REFRESH_SECRET=change-me
+# Comma-separated allowlist (e.g. NexusBoard + local tools)
+CORS_ORIGIN=http://localhost:5173,http://localhost:3001
 ```
+
+CORS behavior:
+- `NODE_ENV=development` (and `test`): all origins are allowed.
+- `NODE_ENV=production`: `CORS_ORIGIN` is required and only listed origins are allowed.
+- Requests without an `Origin` header (curl/server-to-server) are allowed.
 
 ### Docker execution (`.env.docker`)
 
@@ -395,13 +402,14 @@ All errors are normalized through middlewares/error.js.
 ## 🧭 Roadmap / Improvements
 
 Done:
-- ✅ node:test + Supertest test suites
+- ✅ Jest + Supertest test suites (#7)
+- ✅ Swagger/OpenAPI published at `/docs` (#5)
 - ✅ Security middlewares (morgan, helmet, CORS, rate limiting)
 - ✅ GitHub Actions smoke CI
 
 Next:
 - ⚙️ Add async route wrapper for clean error flow
-- 📘 Integrate Swagger/OpenAPI at /docs
+- 📘 Expand OpenAPI coverage beyond `/todos` endpoints
 - 🔧 Introduce config loader by environment
 - 🚀 Expand CI to run smoke + full tests
 
@@ -447,7 +455,7 @@ git push origin docs/refresh-readme
 ## ✅ Notes
 
 - CI smoke workflow is configured (`.github/workflows/ci.yml`)
-- `npm test` runs `node --test`
+- `npm test` runs Jest (`--runInBand`)
 - Refresh token reuse behavior is documented in `docs/auth-refresh-token-reuse.md`
 - Topics: consider adding
 - nodejs, express, mongodb, mongoose, rest-api, backend, portfolio, javascript
