@@ -200,7 +200,7 @@ docker compose exec api ./scripts/smoke.sh
 | 設定管理           | dotenv                    |
 | エラーハンドリング | カスタムミドルウェア      |
 | 開発支援           | Nodemon, ESLint, Prettier |
-| テスト             | node:test + Supertest     |
+| テスト             | Jest + Supertest          |
 
 ℹ️ CI は GitHub Actions（`.github/workflows/ci.yml`）でスモークチェックを実行しています。
 
@@ -217,7 +217,14 @@ NODE_ENV=development
 JWT_SECRET=change-me
 # 任意（未設定時は JWT_SECRET を使用）
 JWT_REFRESH_SECRET=change-me
+# カンマ区切りの許可リスト（NexusBoard など複数フロントに対応）
+CORS_ORIGIN=http://localhost:5173,http://localhost:3001
 ```
+
+CORS の動作:
+- `NODE_ENV=development`（および `test`）: 全 Origin を許可。
+- `NODE_ENV=production`: `CORS_ORIGIN` を必須とし、列挙した Origin のみ許可。
+- `Origin` ヘッダなしのリクエスト（curl / server-to-server）は許可。
 
 ### Docker 実行時（`.env.docker`）
 
@@ -402,13 +409,14 @@ make seed
 ## 🧭 ロードマップ / 改善予定
 
 完了:
-- ✅ node:test + Supertest テストスイート
+- ✅ Jest + Supertest テストスイート（#7）
+- ✅ Swagger / OpenAPI を `/docs` で公開（#5）
 - ✅ セキュリティミドルウェア（morgan / helmet / CORS / rate limit）
 - ✅ GitHub Actions のスモークCI
 
 次:
 - ⚙️ 非同期ルート用エラーハンドラ追加
-- 📘 Swagger / OpenAPI ドキュメントを /docs で提供
+- 📘 `/todos` 以外の OpenAPI カバレッジを拡張
 - 🔧 環境別設定ローダーの導入
 - 🚀 CIでスモーク + 全テストを実行
 

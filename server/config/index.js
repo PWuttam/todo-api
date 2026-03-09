@@ -11,7 +11,7 @@ const schema = Joi.object({
   MONGODB_URI: Joi.string().required().messages({
     'any.required': '❌ MONGODB_URI が設定されていません',
   }),
-  CORS_ORIGIN: Joi.string().default('*'), // ← フロントのURLなど
+  CORS_ORIGIN: Joi.string().allow('').optional(), // comma-separated allowlist
   NODE_ENV: Joi.string()
     .valid('development', 'production', 'test') // ← Jestなども考慮
     .default('development'),
