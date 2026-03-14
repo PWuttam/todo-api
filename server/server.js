@@ -15,6 +15,16 @@ import config from './config/index.js';
 import buildCspDirectives from './config/csp.js';
 import { createCorsOptions } from './config/cors.js';
 import openapiSpec from './config/openapi.js';
+import { createHttpError, createNotFoundError } from './utils/http-errors.js';
+
+function handleRateLimitExceeded(_req, _res, next, options) {
+  const message =
+    typeof options.message === 'string'
+      ? options.message
+      : 'Too many requests, please try again later.';
+
+  return next(createHttpError(options.statusCode || 429, message, 'RATE_LIMIT_EXCEEDED'));
+}
 
 console.log('🌱 NODE_ENV:', config.nodeEnv);
 
@@ -59,11 +69,13 @@ const generalLimiter = rateLimit({
   max: 100, // 各IPごとに最大100リクエスト
   message: 'Too many requests, please try again later.',
   skip: (req) => req.path === '/health',
+  handler: handleRateLimitExceeded,
 });
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15分
   max: 5, // 各IPごとに最大5リクエスト
   message: 'Too many authentication attempts, please try again later.',
+  handler: handleRateLimitExceeded,
 });
 app.use('/auth', authLimiter);
 app.use(generalLimiter);
@@ -111,6 +123,8 @@ app.use('/boards', boardsRouter);
 
 // userRoutes を登録
 app.use('/', userRoutes);
+
+app.use((_req, _res, next) => next(createNotFoundError()));
 
 // 共通エラーハンドラ（最後）
 app.use(errorHandler);

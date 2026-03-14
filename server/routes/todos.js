@@ -71,15 +71,25 @@ router.use(auth);
  *       type: object
  *       required:
  *         - error
+ *         - code
  *       properties:
  *         error:
+ *           type: string
+ *         code:
  *           type: string
  *         details:
  *           type: array
  *           description: Present for validation errors.
  *           items:
  *             type: object
- *             additionalProperties: true
+ *             required:
+ *               - field
+ *               - msg
+ *             properties:
+ *               field:
+ *                 type: string
+ *               msg:
+ *                 type: string
  *     TodoListResponse:
  *       type: object
  *       required:

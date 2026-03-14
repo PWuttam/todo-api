@@ -41,12 +41,15 @@ export const hashRefreshToken = (token) => crypto.createHash('sha256').update(to
 const createInvalidRefreshTokenError = () => {
   const error = new Error('Invalid refresh token');
   error.name = 'InvalidRefreshTokenError';
+  error.status = 401;
+  error.code = 'INVALID_TOKEN';
   return error;
 };
 
 const createRefreshTokenReuseError = () => {
   const error = new Error('Refresh token reuse detected');
   error.name = 'RefreshTokenReuseDetectedError';
+  error.code = 'REFRESH_TOKEN_REUSE';
   error.errorCode = 'REFRESH_TOKEN_REUSE';
   error.status = 403;
   return error;

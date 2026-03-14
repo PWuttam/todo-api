@@ -10,6 +10,7 @@ import { body, validationResult } from 'express-validator';
 
 // サービス層をインポート（DBとのやり取りはすべてここで実行）
 import * as todoService from '../services/todos.service.js';
+import { createNotFoundError, createValidationError } from '../utils/http-errors.js';
 
 // ============================================
 // 🔸 1. 入力チェック（バリデーションルール）
@@ -18,7 +19,12 @@ import * as todoService from '../services/todos.service.js';
 // 新規作成用
 export const validateCreate = [
   body('title') // titleフィールドを確認
+    .exists({ checkFalsy: true })
+    .withMessage('title is required')
+    .bail()
     .isString() // 文字列であること
+    .withMessage('title must be a string')
+    .bail()
     .trim() // 余計な空白を除去
     .notEmpty() // 空でないこと
     .withMessage('title is required'), // 条件を満たさなければエラーメッセージ
@@ -41,7 +47,14 @@ export const validateCreate = [
 
 // 更新用
 export const validateUpdate = [
-  body('title').optional().isString().trim().notEmpty(),
+  body('title')
+    .optional()
+    .isString()
+    .withMessage('title must be a string')
+    .bail()
+    .trim()
+    .notEmpty()
+    .withMessage('title is required'),
   body('status').optional().isIn(['pending', 'in-progress', 'completed']),
   body('priority')
     .optional()
@@ -58,30 +71,26 @@ export const validateUpdate = [
 // 🔸 2. 共通バリデーションチェック
 // ============================================
 // ↑ のルールを通った後で、実際に問題があるか確認する関数。
-export const handleValidation = (req, res, next) => {
+export const handleValidation = (req, _res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    // エラーがある場合はHTTP 400（Bad Request）で返す
-    return res.status(400).json({
-      error: 'Validation error',
-      details: errors.array(),
-    });
+    return next(createValidationError(errors.array()));
   }
   // 問題がなければ次の処理へ
-  next();
+  return next();
 };
 
 // ============================================
 // 🔸 3. CREATE（新しいTodoを追加）
 // ============================================
-export const createTodo = async (req, res) => {
+export const createTodo = async (req, res, next) => {
   try {
     // サービス層に実際の作成処理を依頼
     const todo = await todoService.createTodo(req.body);
     // 成功したら 201（Created）で返す
-    res.status(201).json(todo);
+    return res.status(201).json(todo);
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    return next(e);
   }
 };
 
@@ -197,22 +206,30 @@ export const getTodosByBoardId = async (req, res, next) => {
 // ============================================
 // 🔸 5. UPDATE（既存Todoを更新）
 // ============================================
-export const updateTodo = async (req, res) => {
+export const updateTodo = async (req, res, next) => {
   try {
     const updated = await todoService.updateTodo(req.params.id, req.body);
-    if (!updated) return res.status(404).json({ error: 'Not found' });
-    res.json(updated);
+    if (!updated) {
+      return next(createNotFoundError());
+    }
+    return res.json(updated);
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    return next(e);
   }
 };
 
 // ============================================
 // 🔸 6. DELETE（Todoを削除）
 // ============================================
-export const deleteTodo = async (req, res) => {
-  const deleted = await todoService.deleteTodo(req.params.id);
-  if (!deleted) return res.status(404).json({ error: 'Not found' });
-  // 削除成功時は 204 No Content
-  res.status(204).end();
+export const deleteTodo = async (req, res, next) => {
+  try {
+    const deleted = await todoService.deleteTodo(req.params.id);
+    if (!deleted) {
+      return next(createNotFoundError());
+    }
+    // 削除成功時は 204 No Content
+    return res.status(204).end();
+  } catch (e) {
+    return next(e);
+  }
 };

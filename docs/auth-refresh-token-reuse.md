@@ -18,7 +18,7 @@
 ```json
 {
   "error": "Refresh token reuse detected",
-  "errorCode": "REFRESH_TOKEN_REUSE"
+  "code": "REFRESH_TOKEN_REUSE"
 }
 ```
 

@@ -297,7 +297,7 @@ For backward compatibility, `GET /todos?boardId=<id>` returns the same result. B
 
 ### Refresh token reuse detection (#77)
 
-When a rotated/revoked refresh token is replayed, `/auth/refresh` returns `403` with `errorCode: "REFRESH_TOKEN_REUSE"`.
+When a rotated/revoked refresh token is replayed, `/auth/refresh` returns `403` with `code: "REFRESH_TOKEN_REUSE"`.
 See: [docs/auth-refresh-token-reuse.md](./docs/auth-refresh-token-reuse.md)
 
 ## 🗂️ Project Structure
@@ -370,11 +370,13 @@ npm test        # run Jest + Supertest suites
 Targeted test execution:
 
 ```bash
-npx jest tests/todos.test.js --runInBand
-npx jest tests/smoke.e2e.test.js --runInBand
+npm run test:file -- tests/errors.test.js
+npm run test:file -- tests/todos.test.js
+npm run test:file -- tests/smoke.e2e.test.js
 ```
 
 Issue #7 test scope:
+- `tests/errors.test.js`: covers standardized `400 / 404 / 500` error responses.
 - `tests/todos.test.js`: covers Todo CRUD happy paths and a representative validation error.
 - `tests/smoke.e2e.test.js`: covers one end-to-end flow (`create -> list -> update -> delete`).
 - `tests/auth.test.js` still exists as a `node:test` suite and is run separately.
@@ -393,11 +395,39 @@ make seed
 
 ## ⚠️ Error Handling
 
-All errors are normalized through middlewares/error.js.
+Runtime API errors are normalized through `server/middlewares/error.js`.
 
-- Stack traces visible only in non-production mode.
-- Future improvement: unify async route handling with a global wrapper.
-- 400/404/500 responses are structured for frontend consumption.
+- All error responses follow `{ error, code, details? }`.
+- `details` is omitted when there is nothing to return.
+- 500 responses intentionally hide internal exception details from clients.
+
+Validation example:
+
+```json
+{
+  "error": "Validation error",
+  "code": "VALIDATION_ERROR",
+  "details": [{ "field": "title", "msg": "title is required" }]
+}
+```
+
+Not found example:
+
+```json
+{
+  "error": "Not found",
+  "code": "NOT_FOUND"
+}
+```
+
+Internal error example:
+
+```json
+{
+  "error": "Internal Server Error",
+  "code": "INTERNAL_ERROR"
+}
+```
 
 ## 🧭 Roadmap / Improvements
 

@@ -303,7 +303,7 @@ curl http://localhost:3001/boards/<boardId>/todos \
 ### Refresh Token Reuse Detection（#77）
 
 rotated/revoked 済みの refresh token が再利用された場合、`/auth/refresh` は
-`403` と `errorCode: "REFRESH_TOKEN_REUSE"` を返します。
+`403` と `code: "REFRESH_TOKEN_REUSE"` を返します。
 
 詳細: [docs/auth-refresh-token-reuse.md](./docs/auth-refresh-token-reuse.md)
 
@@ -377,11 +377,13 @@ npm test        # Jest + Supertest テスト実行
 個別テスト実行:
 
 ```bash
-npx jest tests/todos.test.js --runInBand
-npx jest tests/smoke.e2e.test.js --runInBand
+npm run test:file -- tests/errors.test.js
+npm run test:file -- tests/todos.test.js
+npm run test:file -- tests/smoke.e2e.test.js
 ```
 
 Issue #7 のテスト範囲:
+- `tests/errors.test.js`: 統一された `400 / 404 / 500` エラーレスポンスを確認
 - `tests/todos.test.js`: Todo CRUD の happy path と代表的な validation error を確認
 - `tests/smoke.e2e.test.js`: `create -> list -> update -> delete` の通しシナリオを確認
 - `tests/auth.test.js` は `node:test` ベースの既存テストとして別実行
@@ -400,11 +402,39 @@ make seed
 
 ## ⚠️ エラーハンドリング
 
-すべてのエラーは middlewares/error.js で一元管理されます。
+実際の API エラー応答は `server/middlewares/error.js` で一元管理されます。
 
-- 本番環境以外ではスタックトレースを出力
-- 非同期ルートの統一的エラーハンドリングは今後追加予定
-- 400 / 404 / 500 応答は整形済みで、フロント側で扱いやすい形式
+- すべてのエラーレスポンスは `{ error, code, details? }` 形式です。
+- `details` は返す内容がある場合のみ含まれます。
+- 500 系では内部例外の詳細をレスポンスへ露出しません。
+
+Validation エラー例:
+
+```json
+{
+  "error": "Validation error",
+  "code": "VALIDATION_ERROR",
+  "details": [{ "field": "title", "msg": "title is required" }]
+}
+```
+
+Not found 例:
+
+```json
+{
+  "error": "Not found",
+  "code": "NOT_FOUND"
+}
+```
+
+500 エラー例:
+
+```json
+{
+  "error": "Internal Server Error",
+  "code": "INTERNAL_ERROR"
+}
+```
 
 ## 🧭 ロードマップ / 改善予定
 

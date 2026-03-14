@@ -5,20 +5,27 @@ import {
   rotateRefreshToken,
   revokeRefreshToken,
 } from '../services/auth.service.js';
+import { createHttpError, createValidationError } from '../utils/http-errors.js';
 
 const TOKEN_TYPE = 'Bearer';
 
 export const validateRefresh = [
-  body('refreshToken').isString().trim().notEmpty().withMessage('refreshToken is required'),
+  body('refreshToken')
+    .exists({ checkFalsy: true })
+    .withMessage('refreshToken is required')
+    .bail()
+    .isString()
+    .withMessage('refreshToken must be a string')
+    .bail()
+    .trim()
+    .notEmpty()
+    .withMessage('refreshToken is required'),
 ];
 
-export const handleValidation = (req, res, next) => {
+export const handleValidation = (req, _res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
-      error: 'Validation error',
-      details: errors.array(),
-    });
+    return next(createValidationError(errors.array()));
   }
   return next();
 };
@@ -32,7 +39,7 @@ export const refreshAccessToken = async (req, res, next) => {
     });
 
     if (payload.tokenType && payload.tokenType !== 'refresh') {
-      return res.status(401).json({ error: 'Invalid token' });
+      return next(createHttpError(401, 'Invalid token', 'INVALID_TOKEN'));
     }
 
     const { tokenType, iat, exp, nbf, iss, aud, sub, jti, ...userPayload } = payload;
@@ -45,10 +52,7 @@ export const refreshAccessToken = async (req, res, next) => {
     });
   } catch (e) {
     if (e.name === 'RefreshTokenReuseDetectedError') {
-      return res.status(e.status || 403).json({
-        error: e.message,
-        errorCode: e.errorCode || 'REFRESH_TOKEN_REUSE',
-      });
+      return next(e);
     }
 
     if (
@@ -56,7 +60,7 @@ export const refreshAccessToken = async (req, res, next) => {
       e.name === 'JsonWebTokenError' ||
       e.name === 'InvalidRefreshTokenError'
     ) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return next(createHttpError(401, 'Invalid token', 'INVALID_TOKEN'));
     }
     return next(e);
   }
@@ -68,7 +72,7 @@ export const logout = async (req, res, next) => {
     const revoked = await revokeRefreshToken(refreshToken);
 
     if (!revoked) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return next(createHttpError(401, 'Invalid token', 'INVALID_TOKEN'));
     }
 
     return res.status(204).send();
@@ -78,7 +82,7 @@ export const logout = async (req, res, next) => {
       e.name === 'JsonWebTokenError' ||
       e.name === 'InvalidRefreshTokenError'
     ) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return next(createHttpError(401, 'Invalid token', 'INVALID_TOKEN'));
     }
     return next(e);
   }

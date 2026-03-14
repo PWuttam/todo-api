@@ -68,7 +68,7 @@ describe('Auth refresh rotation and logout', () => {
     assert.equal(newToken.familyId, oldToken.familyId);
 
     const reuse = await request(app).post('/auth/refresh').send({ refreshToken }).expect(403);
-    assert.equal(reuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
+    assert.equal(reuse.body.code, 'REFRESH_TOKEN_REUSE');
   });
 
   test('logout revokes the refresh token', async () => {
@@ -77,7 +77,7 @@ describe('Auth refresh rotation and logout', () => {
     await request(app).post('/auth/logout').send({ refreshToken }).expect(204);
 
     const reuse = await request(app).post('/auth/refresh').send({ refreshToken }).expect(403);
-    assert.equal(reuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
+    assert.equal(reuse.body.code, 'REFRESH_TOKEN_REUSE');
   });
 
   test('reusing a rotated refresh token revokes all user tokens and records security event', async () => {
@@ -100,7 +100,7 @@ describe('Auth refresh rotation and logout', () => {
       .post('/auth/refresh')
       .send({ refreshToken: firstToken })
       .expect(403);
-    assert.equal(reuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
+    assert.equal(reuse.body.code, 'REFRESH_TOKEN_REUSE');
     const decoded = jwt.decode(firstToken);
 
     const tokens = await RefreshToken.find({ userId: 'user-3' }).lean();
@@ -134,7 +134,7 @@ describe('Auth refresh rotation and logout', () => {
     await request(app).post('/auth/logout').send({ refreshToken }).expect(204);
 
     const reuse = await request(app).post('/auth/refresh').send({ refreshToken }).expect(403);
-    assert.equal(reuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
+    assert.equal(reuse.body.code, 'REFRESH_TOKEN_REUSE');
 
     const tokens = await RefreshToken.find({ userId: 'user-4' }).lean();
     assert.ok(tokens.length >= 2);
@@ -154,6 +154,6 @@ describe('Auth refresh rotation and logout', () => {
       .post('/auth/refresh')
       .send({ refreshToken })
       .expect(403);
-    assert.equal(followupTokenReuse.body.errorCode, 'REFRESH_TOKEN_REUSE');
+    assert.equal(followupTokenReuse.body.code, 'REFRESH_TOKEN_REUSE');
   });
 });
