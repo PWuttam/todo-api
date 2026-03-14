@@ -105,7 +105,10 @@ describe('Todos API', () => {
       .expect(400);
 
     expect(res.body.error).toBe('Validation error');
+    expect(res.body.code).toBe('VALIDATION_ERROR');
     expect(Array.isArray(res.body.details)).toBe(true);
-    expect(res.body.details.length).toBeGreaterThan(0);
+    expect(res.body.details).toEqual(
+      expect.arrayContaining([{ field: 'title', msg: 'title is required' }])
+    );
   });
 });

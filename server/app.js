@@ -15,6 +15,16 @@ import config from './config/index.js';
 import buildCspDirectives from './config/csp.js';
 import { createCorsOptions } from './config/cors.js';
 import openapiSpec from './config/openapi.js';
+import { createHttpError, createNotFoundError } from './utils/http-errors.js';
+
+function handleRateLimitExceeded(_req, _res, next, options) {
+  const message =
+    typeof options.message === 'string'
+      ? options.message
+      : 'Too many requests, please try again later.';
+
+  return next(createHttpError(options.statusCode || 429, message, 'RATE_LIMIT_EXCEEDED'));
+}
 
 export function createApp() {
   const app = express();
@@ -43,6 +53,7 @@ export function createApp() {
     max: 100,
     message: 'Too many requests, please try again later.',
     skip: (req) => req.path === '/health',
+    handler: handleRateLimitExceeded,
   });
   app.use(limiter);
 
@@ -88,6 +99,8 @@ export function createApp() {
   app.use('/todos', todosRouter);
   app.use('/boards', boardsRouter);
   app.use('/', userRoutes);
+
+  app.use((_req, _res, next) => next(createNotFoundError()));
 
   // --- エラーハンドラ ---
   app.use(errorHandler);

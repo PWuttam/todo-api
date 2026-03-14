@@ -1,4 +1,9 @@
 export default {
   testEnvironment: 'node',
-  testMatch: ['**/tests/todos.test.js', '**/tests/smoke.e2e.test.js', '**/tests/cors.test.js'],
+  testMatch: [
+    '**/tests/todos.test.js',
+    '**/tests/smoke.e2e.test.js',
+    '**/tests/cors.test.js',
+    '**/tests/errors.test.js',
+  ],
 };

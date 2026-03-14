@@ -5,6 +5,7 @@
 // ============================================
 
 import * as boardService from '../services/boards.service.js';
+import { createHttpError } from '../utils/http-errors.js';
 
 // ============================================
 // 🔸 GET /boards - 認証済みユーザーのBoard一覧
@@ -12,7 +13,7 @@ import * as boardService from '../services/boards.service.js';
 export const getBoards = async (req, res, next) => {
   try {
     if (!req.user || !req.user.id) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return next(createHttpError(401, 'Unauthorized', 'UNAUTHORIZED'));
     }
 
     const boards = await boardService.getBoardsByOwnerId(String(req.user.id));
@@ -22,8 +23,8 @@ export const getBoards = async (req, res, next) => {
       createdAt: board.createdAt,
     }));
 
-    res.json({ boards: payload });
+    return res.json({ boards: payload });
   } catch (e) {
-    next(e);
+    return next(e);
   }
 };

@@ -7,6 +7,7 @@
     "dev": "nodemon server/server.js",
     "lint": "eslint .",
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test:file": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand --runTestsByPath",
     "migrate:token-reuse-77": "node scripts/migrations/20260223-token-reuse-detection-77.js"
   },
   "dependencies": {
