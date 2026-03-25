@@ -1,6 +1,5 @@
 import { describe, test, before, after, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import mongoose from 'mongoose';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 
@@ -10,6 +9,7 @@ let createApp;
 let RefreshToken;
 let SecurityEvent;
 let issueRefreshToken;
+let mongoose;
 
 before(async () => {
   process.env.NODE_ENV = 'test';
@@ -18,7 +18,7 @@ before(async () => {
   process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
   process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh-secret';
 
-  ({ connectDB } = await import('../server/config/db.js'));
+  ({ connectDB, mongoose } = await import('../server/config/db.js'));
   ({ createApp } = await import('../server/app.js'));
   ({ default: RefreshToken } = await import('../server/models/refreshToken.js'));
   ({ default: SecurityEvent } = await import('../server/models/securityEvent.js'));

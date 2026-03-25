@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 import request from 'supertest';
 
 let app;
 let Todo;
 let connectDB;
 let authHeader;
+let server;
+let mongoose;
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
@@ -13,12 +14,13 @@ beforeAll(async () => {
     process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/todo_api_test';
   process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret';
 
-  ({ connectDB } = await import('../server/config/db.js'));
+  ({ connectDB, mongoose } = await import('../server/config/db.js'));
   const { createApp } = await import('../server/app.js');
   ({ default: Todo } = await import('../server/models/todo.js'));
 
   await connectDB();
   app = createApp();
+  server = app.listen(0);
 
   const token = jwt.sign(
     { id: 'test-user-id', email: 'test@example.com', tokenType: 'access' },
@@ -29,9 +31,20 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  if (server) {
+    await new Promise((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    });
+  }
+
   if (mongoose.connection.readyState !== 0) {
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
+    await mongoose.connection.close(true);
   }
 });
 
@@ -41,7 +54,7 @@ beforeEach(async () => {
 
 describe('Todos API', () => {
   test('creates a todo (happy path)', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/todos')
       .set('Authorization', authHeader)
       .send({ title: 'Test todo', status: 'pending' })
@@ -52,13 +65,13 @@ describe('Todos API', () => {
   });
 
   test('lists todos including the created one (happy path)', async () => {
-    await request(app)
+    await request(server)
       .post('/todos')
       .set('Authorization', authHeader)
       .send({ title: 'List me' })
       .expect(201);
 
-    const res = await request(app).get('/todos').set('Authorization', authHeader).expect(200);
+    const res = await request(server).get('/todos').set('Authorization', authHeader).expect(200);
 
     expect(Array.isArray(res.body.items)).toBe(true);
     expect(res.body.total).toBe(1);
@@ -66,13 +79,13 @@ describe('Todos API', () => {
   });
 
   test('updates a todo status (happy path)', async () => {
-    const created = await request(app)
+    const created = await request(server)
       .post('/todos')
       .set('Authorization', authHeader)
       .send({ title: 'Update me', status: 'pending' })
       .expect(201);
 
-    const updated = await request(app)
+    const updated = await request(server)
       .put(`/todos/${created.body._id}`)
       .set('Authorization', authHeader)
       .send({ status: 'completed' })
@@ -82,23 +95,23 @@ describe('Todos API', () => {
   });
 
   test('deletes a todo (happy path)', async () => {
-    const created = await request(app)
+    const created = await request(server)
       .post('/todos')
       .set('Authorization', authHeader)
       .send({ title: 'Delete me' })
       .expect(201);
 
-    await request(app)
+    await request(server)
       .delete(`/todos/${created.body._id}`)
       .set('Authorization', authHeader)
       .expect(204);
 
-    const res = await request(app).get('/todos').set('Authorization', authHeader).expect(200);
+    const res = await request(server).get('/todos').set('Authorization', authHeader).expect(200);
     expect(res.body.total).toBe(0);
   });
 
   test('returns validation error when title is missing', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/todos')
       .set('Authorization', authHeader)
       .send({ status: 'pending' })
