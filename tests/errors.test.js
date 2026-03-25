@@ -3,6 +3,7 @@ import request from 'supertest';
 
 let app;
 let authHeader;
+let server;
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
@@ -10,6 +11,7 @@ beforeAll(async () => {
 
   const { createApp } = await import('../server/app.js');
   app = createApp();
+  server = app.listen(0);
 
   const token = jwt.sign(
     { id: 'errors-user-id', email: 'errors@example.com', tokenType: 'access' },
@@ -20,9 +22,23 @@ beforeAll(async () => {
   authHeader = `Bearer ${token}`;
 });
 
+afterAll(async () => {
+  if (server) {
+    await new Promise((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    });
+  }
+});
+
 describe('Error responses', () => {
   test('returns VALIDATION_ERROR for POST /todos without title', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/todos')
       .set('Authorization', authHeader)
       .send({ status: 'pending' })
@@ -36,7 +52,7 @@ describe('Error responses', () => {
   });
 
   test('returns NOT_FOUND for an undefined route', async () => {
-    const res = await request(app).get('/does-not-exist').expect(404);
+    const res = await request(server).get('/does-not-exist').expect(404);
 
     expect(res.body).toEqual({
       error: 'Not found',
@@ -45,7 +61,7 @@ describe('Error responses', () => {
   });
 
   test('returns INTERNAL_ERROR for unexpected errors', async () => {
-    const res = await request(app).get('/error-test').expect(500);
+    const res = await request(server).get('/error-test').expect(500);
 
     expect(res.body).toEqual({
       error: 'Internal Server Error',
